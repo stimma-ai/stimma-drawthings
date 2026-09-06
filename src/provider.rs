@@ -31,7 +31,7 @@ impl App {
         let mut p = json!({"stp_version":"1.0","provider_id":"stimma-drawthings","provider_name":"Draw Things","server":concat!("stimma-drawthings/",env!("CARGO_PKG_VERSION")),"max_concurrent":1,"capabilities":{"cancel":true,"provider_state":true}});
         if websocket {
             p["asset_endpoint"] = json!("/assets");
-            p["presentation"] = json!({"management_url":crate::manager::PREFIX,"icon":format!("data:image/svg+xml;base64,{}",base64::Engine::encode(&base64::engine::general_purpose::STANDARD,include_bytes!("../manager-ui/public/drawthings.svg")))});
+            p["presentation"] = json!({"management_url":crate::manager::PREFIX,"icon":format!("data:image/png;base64,{}",base64::Engine::encode(&base64::engine::general_purpose::STANDARD,include_bytes!("../manager-ui/public/drawthings-icon.png")))});
         }
         json!({"jsonrpc":"2.0","id":"register","method":"provider.register","params":p})
     }

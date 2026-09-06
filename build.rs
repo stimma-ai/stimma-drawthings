@@ -96,6 +96,7 @@ fn manager_assets(out: &std::path::Path) -> Result<(), Box<dyn std::error::Error
                 "css" => "text/css",
                 "js" => "text/javascript",
                 "svg" => "image/svg+xml",
+                "png" => "image/png",
                 "woff2" => "font/woff2",
                 _ => "application/octet-stream",
             };

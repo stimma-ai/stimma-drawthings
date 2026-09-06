@@ -6,7 +6,7 @@ const tab = ref(tabs.find(t => t.toLowerCase() === location.hash.slice(1)) || 'O
 const data = ref(null), error = ref(''), pending = ref(false), search = ref(''), installedOnly = ref(false), copied = ref(false)
 const selected = ref({})
 const apiBase = new URL('./api/', location.href)
-const icon = new URL('../public/drawthings.svg', import.meta.url).href
+const icon = new URL('../public/drawthings.png', import.meta.url).href
 const statusClasses = { done:'text-success', failed:'text-failure', running:'text-running', cancelled:'text-content-tertiary' }
 const profiles = computed(() => (data.value?.profiles || []).filter(p => (!installedOnly.value || p.files.some(f => f.installed)) && `${p.name} ${p.id}`.toLowerCase().includes(search.value.toLowerCase())))
 const downloaded = computed(() => new Set((data.value?.profiles || []).flatMap(p => p.files.filter(f => f.installed).map(f => f.file))).size)

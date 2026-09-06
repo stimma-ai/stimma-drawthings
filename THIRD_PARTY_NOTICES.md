@@ -46,7 +46,7 @@ Build-only and test-only tools are not part of the shipped executable.
 
 ## Manager artwork and fonts
 
-The Draw Things app artwork is from [drawthings.ai](https://drawthings.ai/images/Logo-Lockup-H-1.png), used to identify the connected provider. The SVG currently embeds that official raster artwork; it is not a vector redraw. Draw Things branding belongs to Draw Things, Inc.
+The Draw Things app icons are from [drawthings.ai](https://drawthings.ai/images/webclip.png), used to identify the connected provider. Draw Things branding belongs to Draw Things, Inc.
 
 General Sans is by Indian Type Foundry, obtained from [Fontshare](https://www.fontshare.com/fonts/general-sans) for the manager interface. Its [font license](vendor/fonts/LICENSE.txt) accompanies the application.
 

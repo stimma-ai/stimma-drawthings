@@ -5,3 +5,5 @@ Start and stop the managed engine, browse checkpoints, download models ahead of 
 Token authentication is optional on both localhost and network listeners.
 
 The existing 28 model-specific STP tools are unchanged.
+
+Uses the official PNG app artwork for compatibility with embedded browsers; the provider icon fits within STP’s size limit.
