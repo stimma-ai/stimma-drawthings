@@ -23,7 +23,7 @@ type Replies<T> = Pin<Box<dyn Stream<Item = Result<T, Status>> + Send>>;
 
 fn catalog() -> proto::MetadataOverride {
     proto::MetadataOverride {
-        models:serde_json::to_vec(&json!([{"name":"Z Image Turbo Test","version":"z_image","file":"z_image_turbo_test.ckpt"}])).unwrap(),
+        models:serde_json::to_vec(&json!([{"name":"Z Image Turbo Test","version":"z_image","file":"z_image_turbo_test.ckpt","stp_installed":true}])).unwrap(),
         loras:b"[]".to_vec(),control_nets:b"[]".to_vec(),upscalers:b"[]".to_vec(),textual_inversions:b"[]".to_vec()
     }
 }
@@ -418,6 +418,10 @@ async fn network_listener_works_without_auth_configuration() {
     let port = reserve.local_addr().unwrap().port();
     drop(reserve);
     let dir = tempfile::tempdir().unwrap();
+    // A managed engine offers only checkpoints present in its model folder.
+    let models = dir.path().join("models");
+    std::fs::create_dir_all(&models).unwrap();
+    std::fs::write(models.join("z_image_turbo_1.0_q8p.ckpt"), b"fixture").unwrap();
     let mut provider = tokio::process::Command::new(env!("CARGO_BIN_EXE_stimma-drawthings"))
         .args([
             "--websocket",
@@ -427,6 +431,8 @@ async fn network_listener_works_without_auth_configuration() {
             "--state-path",
         ])
         .arg(dir.path())
+        .arg("--models-dir")
+        .arg(&models)
         .env_remove("STIMMA_DRAWTHINGS_TOKEN")
         .kill_on_drop(true)
         .stdout(std::process::Stdio::null())
@@ -465,7 +471,12 @@ async fn network_listener_works_without_auth_configuration() {
         "{}",
         String::from_utf8_lossy(&result.stderr)
     );
-    assert!(String::from_utf8_lossy(&result.stdout).contains("z-image-turbo"));
+    let listed = String::from_utf8_lossy(&result.stdout);
+    assert!(listed.contains("z-image-turbo"));
+    assert!(
+        !listed.contains("flux2-klein-9b"),
+        "Tools without a downloaded checkpoint must stay off the wire"
+    );
     let client = reqwest::Client::new();
     let base = format!("http://127.0.0.1:{port}/stp-v1/manage");
     let html = client
@@ -489,8 +500,39 @@ async fn network_listener_works_without_auth_configuration() {
         .json()
         .await
         .unwrap();
-    assert_eq!(overview["tools_count"], 28);
+    assert_eq!(overview["tools_count"], 1);
+    assert_eq!(overview["tools_ready"], 1);
+    assert_eq!(overview["state"], "ready");
+    assert_eq!(overview["hosts"][0]["local"], true);
     assert_eq!(overview["stp_url"], format!("ws://127.0.0.1:{port}/stp-v1"));
+    let tools: Value = client
+        .get(format!("{base}/api/tools"))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    let rows = tools["tools"].as_array().unwrap();
+    assert_eq!(rows.iter().filter(|t| t["state"] == "ready").count(), 1);
+    assert!(rows
+        .iter()
+        .any(|t| t["id"] == "flux2-klein-9b" && t["state"] == "needs_setup"));
+    let detail: Value = client
+        .get(format!("{base}/api/tools/z-image-turbo"))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(detail["file"], "z_image_turbo_1.0_q8p.ckpt");
+    assert_eq!(detail["files"][0]["installed"], true);
+    assert!(
+        detail["missing"].as_u64().unwrap() >= 2,
+        "encoders are still missing"
+    );
+    assert_eq!(detail["blockers"][0]["kind"], "offline");
     let invalid = client
         .post(format!("{base}/api/action"))
         .json(&json!({"action":"install","file":"../../not-a-model"}))

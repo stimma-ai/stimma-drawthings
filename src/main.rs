@@ -94,8 +94,28 @@ async fn main() -> Result<()> {
         .unwrap_or_else(|| state.join("assets"));
     let result = tokio::select! {
         result=async{if args.websocket{transport::serve(app.clone(),assets,args.bind,std::env::var("STIMMA_DRAWTHINGS_TOKEN").ok()).await}else{transport::stdio(app.clone(),assets).await}}=>result,
-        result=tokio::signal::ctrl_c()=>result.context("Signal handler failed"),
+        result=shutdown_signal()=>result,
     };
     app.runtime.stop().await?;
     result
+}
+
+/// Ctrl-C, or SIGTERM from a host that stops the adapter, so the managed
+/// engine child is dropped and killed rather than left running.
+async fn shutdown_signal() -> Result<()> {
+    #[cfg(unix)]
+    {
+        let mut term = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+            .context("Signal handler failed")?;
+        tokio::select! {
+            result = tokio::signal::ctrl_c() => result.context("Signal handler failed"),
+            _ = term.recv() => Ok(()),
+        }
+    }
+    #[cfg(not(unix))]
+    {
+        tokio::signal::ctrl_c()
+            .await
+            .context("Signal handler failed")
+    }
 }

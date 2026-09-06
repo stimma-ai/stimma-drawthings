@@ -5,7 +5,7 @@ use stimma_drawthings::{catalog, generation, install, media, proto::MetadataOver
 fn advanced_configuration_survives_wire_roundtrip() {
     let models = MetadataOverride {
         models: serde_json::to_vec(
-            &json!([{"name":"SDXL","version":"sdxl_base_v0.9","file":"sd_xl_base_test.ckpt"}]),
+            &json!([{"name":"SDXL","version":"sdxl_base_v0.9","file":"sd_xl_base_test.ckpt","stp_installed":true}]),
         )
         .unwrap(),
         ..Default::default()

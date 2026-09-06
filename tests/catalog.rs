@@ -4,8 +4,13 @@ use stimma_drawthings::{catalog, generation, proto::MetadataOverride};
 fn metadata() -> MetadataOverride {
     let base: Value = serde_json::from_str(include_str!("../data/curated_models.json")).unwrap();
     let addons: Value = serde_json::from_str(include_str!("../data/addons.json")).unwrap();
+    // Every curated checkpoint counts as downloaded so all tools are offered.
+    let mut models = base["models"].clone();
+    for model in models.as_array_mut().unwrap() {
+        model["stp_installed"] = json!(true);
+    }
     MetadataOverride {
-        models: serde_json::to_vec(&base["models"]).unwrap(),
+        models: serde_json::to_vec(&models).unwrap(),
         loras: serde_json::to_vec(&addons["loras"]).unwrap(),
         control_nets: serde_json::to_vec(&addons["control_nets"]).unwrap(),
         upscalers: serde_json::to_vec(&addons["upscalers"]).unwrap(),
@@ -49,6 +54,43 @@ fn all_named_tools_have_valid_defaults_and_pack_configuration() {
         generation::configuration(&profile, &params, input.get("input_images").is_some())
             .unwrap_or_else(|e| panic!("{id}: {e}"));
     }
+    // Tools without a downloaded checkpoint are flagged for hosts that ask,
+    // hidden from others, and never executable.
+    let mut missing = metadata();
+    let mut models: Vec<Value> = serde_json::from_slice(&missing.models).unwrap();
+    for model in &mut models {
+        if model["file"] == "z_image_turbo_1.0_q8p.ckpt" {
+            model["stp_installed"] = json!(false);
+        }
+    }
+    missing.models = serde_json::to_vec(&models).unwrap();
+    let hidden = catalog::descriptors(&missing);
+    assert_eq!(hidden["tools"].as_array().unwrap().len(), 27);
+    assert!(!hidden["tools"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|t| t["id"] == "z-image-turbo"));
+    let flagged = catalog::descriptors_for(&missing, true);
+    let z = flagged["tools"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|t| t["id"] == "z-image-turbo")
+        .unwrap();
+    assert_eq!(z["status"], "needs_setup");
+    assert!(catalog::prepare("z-image-turbo", &json!({"prompt":"test"}), &missing).is_err());
+    // Ready tools only offer downloaded checkpoints.
+    let ready = descriptors["tools"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|t| t["id"] == "z-image-turbo")
+        .unwrap();
+    assert_eq!(
+        ready["parameter_schema"]["properties"]["checkpoint"]["enum"],
+        json!(["z_image_turbo_1.0_q8p.ckpt"])
+    );
     for old in [
         "native-image",
         "native-image-inpaint",

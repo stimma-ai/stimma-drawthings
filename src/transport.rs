@@ -190,7 +190,9 @@ pub async fn serve(
     let listener = tokio::net::TcpListener::bind(bind)
         .await
         .context("Binding STP WebSocket server")?;
-    eprintln!("Draw Things STP listening on {bind}");
+    // Report the bound address, so `--bind 127.0.0.1:0` tells a host which port it got.
+    let bound = listener.local_addr().unwrap_or(bind);
+    eprintln!("Draw Things STP listening on {bound}");
     axum::serve(listener, router).await?;
     Ok(())
 }

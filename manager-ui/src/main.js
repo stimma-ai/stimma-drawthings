@@ -1,10 +1,14 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import './style.css'
-const initial = new URLSearchParams(location.search).get('theme')
-document.documentElement.dataset.theme = initial === 'light' ? 'light' : 'dark'
-window.addEventListener('message', e => {
-  if (e.source !== window.parent) return
-  if (e.data?.type === 'stimma-theme' && ['light','dark'].includes(e.data.theme)) document.documentElement.dataset.theme = e.data.theme
+
+const params = new URLSearchParams(location.search)
+const theme = params.get('theme') === 'light' ? 'light' : 'dark'
+document.documentElement.setAttribute('data-theme', theme)
+window.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'stimma-theme' && (e.data.theme === 'light' || e.data.theme === 'dark')) {
+    document.documentElement.setAttribute('data-theme', e.data.theme)
+  }
 })
+
 createApp(App).mount('#app')

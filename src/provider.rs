@@ -31,7 +31,7 @@ impl App {
         let mut p = json!({"stp_version":"1.0","provider_id":"stimma-drawthings","provider_name":"Draw Things","server":concat!("stimma-drawthings/",env!("CARGO_PKG_VERSION")),"max_concurrent":1,"capabilities":{"cancel":true,"provider_state":true}});
         if websocket {
             p["asset_endpoint"] = json!("/assets");
-            p["presentation"] = json!({"management_url":crate::manager::PREFIX,"icon":format!("data:image/png;base64,{}",base64::Engine::encode(&base64::engine::general_purpose::STANDARD,include_bytes!("../manager-ui/public/drawthings-icon.png")))});
+            p["presentation"] = json!({"management_url":crate::manager::PREFIX,"icon":format!("data:image/png;base64,{}",base64::Engine::encode(&base64::engine::general_purpose::STANDARD,include_bytes!("../manager-ui/public/drawthings.png")))});
         }
         json!({"jsonrpc":"2.0","id":"register","method":"provider.register","params":p})
     }
@@ -115,6 +115,9 @@ pub async fn session(
     send(&tx, json!({"jsonrpc":"2.0","method":"provider.state","params":{"state":if app.capacity.available_permits()==0 {"in_progress"} else {"ready"}}})).await?;
     let mut jobs: Vec<Job> = Vec::new();
     let mut uploads: HashMap<String, Value> = HashMap::new();
+    // Hosts advertising `tool_status` receive not-yet-downloaded tools flagged
+    // needs_setup (counted, never offered); others only see ready tools.
+    let mut tool_status = false;
     let outcome=async {
         loop {
             let message=tokio::select! {
@@ -124,14 +127,16 @@ pub async fn session(
                     let finished=jobs.remove(outcome.1);terminal(&app,&tx,&finished.id,outcome.0.map_err(anyhow::Error::from).and_then(|r|r)).await?;continue;
                 }
             };
-            let Some(method)=message["method"].as_str() else{if message.get("result").is_none() && message.get("error").is_none(){error(&tx,message["id"].clone(),-32600,"Invalid request".into()).await?;}continue;};let id=message["id"].clone();let params=&message["params"];
+            let Some(method)=message["method"].as_str() else{
+                if message["id"]=="register" && message["result"]["capabilities"]["tool_status"]==true { tool_status=true; }
+                if message.get("result").is_none() && message.get("error").is_none(){error(&tx,message["id"].clone(),-32600,"Invalid request".into()).await?;}continue;};let id=message["id"].clone();let params=&message["params"];
             match method {
                 "__parse_error"=>error(&tx,Value::Null,-32700,"Parse error".into()).await?,
                 "provider.disconnect"=>break,
                 "ping"|"provider.ping"=>reply(&tx,id,json!({})).await?,
-                "tools.list"=>reply(&tx,id,catalog::descriptors(&*app.catalog.read().await)).await?,
+                "tools.list"=>reply(&tx,id,catalog::descriptors_for(&*app.catalog.read().await,tool_status)).await?,
                 "tools.refresh"=>{
-                    match app.refresh(true).await {Ok(())=>reply(&tx,id,catalog::descriptors(&*app.catalog.read().await)).await?,Err(e)=>error(&tx,id,-32000,e.to_string()).await?,}
+                    match app.refresh(true).await {Ok(())=>reply(&tx,id,catalog::descriptors_for(&*app.catalog.read().await,tool_status)).await?,Err(e)=>error(&tx,id,-32000,e.to_string()).await?,}
                 },
                 "drawthings.status"=>{
                     let live=app.runtime.engine.catalog().await;let catalog=app.catalog.read().await;
@@ -142,7 +147,8 @@ pub async fn session(
                     if request_id.is_empty(){error(&tx,id,-32602,"request_id is required".into()).await?;continue;}
                     if let Err(e)=catalog::prepare(&tool,&parameters,&*app.catalog.read().await){error(&tx,id,-32602,e.to_string()).await?;continue;}
                     if jobs.iter().any(|j| j.id == request_id){error(&tx,id,-32602,"Duplicate request_id".into()).await?;continue;}
-                    app.manager.begin(&format!("{session_prefix}{request_id}"), &tool).await;
+                    let title=catalog::profiles(&*app.catalog.read().await).into_iter().find(|p| tool==p.id||tool.starts_with(&format!("{}-",p.id))).map(|p| p.name).unwrap_or_else(|| tool.clone());
+                    app.manager.begin(&format!("{session_prefix}{request_id}"), &title, "generation", Some(&tool)).await;
                     app.jobs.fetch_add(1,std::sync::atomic::Ordering::SeqCst);
                     let ticket=JobTicket{app:app.clone(),tx:tx.clone()};
                     reply(&tx,id,json!({"accepted":true})).await?;queue(&app,&tx).await?;

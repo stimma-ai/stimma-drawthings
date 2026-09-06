@@ -30,9 +30,11 @@ ws://127.0.0.1:8765/stp-v1
 
 To accept connections from other machines, add `--bind 0.0.0.0:8765` and use this machine's IP address in the connection URL. Authentication is optional: set `STIMMA_DRAWTHINGS_TOKEN` if you want clients to supply a bearer token.
 
-Open the Draw Things manager from Stimma’s provider toolbar, or visit `http://127.0.0.1:8765/stp-v1/manage/` in your browser. It lets you start and stop the engine, browse and download models, and follow recent activity. On a local Mac, Overview also shows GPU utilization, unified-memory usage, memory pressure, and swap. The manager is built into the adapter; there is nothing else to install.
+Open the Draw Things manager from Stimma’s provider toolbar, or visit `http://127.0.0.1:8765/stp-v1/manage/` in your browser. It has the same layout as the ComfyUI manager: Overview shows the Mac’s GPU utilization, unified memory, memory pressure, and what is generating; Tools lists every model the adapter supports, marks the ones that are downloaded, and downloads the rest with one click; Activity follows generations and downloads; Settings has engine controls and the connection URL. The manager is built into the adapter; there is nothing else to install.
 
-Leave the adapter running while you use it. It starts the generation engine when needed and keeps it loaded between requests. The first generation may take longer while models download.
+Stimma only sees tools whose checkpoint is already downloaded, and each tool offers only the downloaded versions of its model. Use the manager to add a model or another version before it appears in Stimma. Nothing downloads on first use.
+
+Leave the adapter running while you use it. It starts the generation engine when needed and keeps it loaded between requests.
 
 If your Draw Things models live in a custom folder, start it with:
 

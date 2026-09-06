@@ -33,8 +33,38 @@ pub struct Profile {
     pub inpaint: bool,
     pub defaults: Value,
     pub files: Vec<String>,
+    pub installed: Vec<String>,
     pub spec: Value,
     pub version: String,
+}
+impl Profile {
+    pub fn ready(&self) -> bool {
+        !self.installed.is_empty()
+    }
+    pub fn task_types(&self) -> Vec<&'static str> {
+        let mut tasks = vec![];
+        if self.spec["restoration"] == true {
+            return vec!["upscale-image"];
+        }
+        if self.spec["requires_image"] != true {
+            tasks.push(if self.video {
+                "text-to-video"
+            } else {
+                "text-to-image"
+            });
+        }
+        if self.image {
+            tasks.push(if self.video {
+                "image-to-video"
+            } else {
+                "image-to-image"
+            });
+        }
+        if self.inpaint {
+            tasks.extend(["inpaint-image", "outpaint-image"]);
+        }
+        tasks
+    }
 }
 fn family(m: &Value) -> String {
     let file = m["file"].as_str().unwrap_or("");
@@ -111,6 +141,11 @@ pub fn profiles(catalog: &MetadataOverride) -> Vec<Profile> {
             let version = models.iter().find(|m| m["file"] == *first)?["version"]
                 .as_str()?
                 .to_owned();
+            let installed_files = files
+                .iter()
+                .filter(|f| installed.contains(*f))
+                .cloned()
+                .collect();
             Some(Profile {
                 id: id.clone(),
                 name: spec["display_name"].as_str().unwrap().into(),
@@ -119,6 +154,7 @@ pub fn profiles(catalog: &MetadataOverride) -> Vec<Profile> {
                 inpaint: spec["supports_inpaint"] == true,
                 defaults: spec["defaults"].clone(),
                 files,
+                installed: installed_files,
                 spec: spec.clone(),
                 version,
             })
@@ -150,7 +186,16 @@ fn descriptor(profile: &Profile, mode: &str, catalog: &MetadataOverride) -> Valu
     let mut props = serde_json::Map::new();
     props.insert("prompt".into(),json!({"type":"string","x-control":"prompt_editor","description":"Describe the desired output."}));
     props.insert("negative_prompt".into(),json!({"type":"string","default":d["negative_prompt"].as_str().unwrap_or(""),"x-control":"textarea"}));
-    props.insert("checkpoint".into(),json!({"type":"string","enum":profile.files,"default":profile.files[0],"x-control":"dropdown"}));
+    // Only downloaded checkpoints are offered; the manager owns downloads.
+    let checkpoints = if profile.ready() {
+        &profile.installed
+    } else {
+        &profile.files
+    };
+    props.insert(
+        "checkpoint".into(),
+        json!({"type":"string","enum":checkpoints,"default":checkpoints[0],"x-control":"dropdown"}),
+    );
     for key in ["width", "height"] {
         let mut schema = number(d[key].clone(), 64.0, 4096.0, true);
         schema["multipleOf"] = json!(64);
@@ -419,11 +464,22 @@ fn descriptor(profile: &Profile, mode: &str, catalog: &MetadataOverride) -> Valu
     .filter(|k| props.contains_key(*k))
     .map(|k| json!({"name":k}))
     .collect();
-    json!({"id":id,"name":if mode=="generate"{profile.name.clone()}else{format!("{} {mode}",profile.name)},"task_types":tasks,"description":"Generate locally with Draw Things; missing official checkpoints download on first use.","parameter_schema":{"type":"object","required":required,"additionalProperties":false,"properties":props},"output_schema":{"type":"object","required":["assets"],"properties":{"assets":{"type":"array","items":{"type":"object"}}}},"layout":[{"label":"Generation","params":main},{"label":"Advanced","collapsed":true,"params":advanced}]})
+    let mut tool = json!({"id":id,"name":if mode=="generate"{profile.name.clone()}else{format!("{} {mode}",profile.name)},"task_types":tasks,"description":"Generate locally with Draw Things.","parameter_schema":{"type":"object","required":required,"additionalProperties":false,"properties":props},"output_schema":{"type":"object","required":["assets"],"properties":{"assets":{"type":"array","items":{"type":"object"}}}},"layout":[{"label":"Generation","params":main},{"label":"Advanced","collapsed":true,"params":advanced}]});
+    if !profile.ready() {
+        tool["status"] = json!("needs_setup");
+        tool["status_items"] = json!([{"kind":"missing_model","name":profile.files[0]}]);
+    }
+    tool
 }
-pub fn descriptors(catalog: &MetadataOverride) -> Value {
+/// Tools whose checkpoint is downloaded. Hosts that advertise `tool_status`
+/// also receive the rest flagged `needs_setup`, so they can count them
+/// without ever offering them; the manager owns downloads.
+pub fn descriptors_for(catalog: &MetadataOverride, include_needs_setup: bool) -> Value {
     let mut tools = vec![];
     for profile in profiles(catalog) {
+        if !profile.ready() && !include_needs_setup {
+            continue;
+        }
         tools.push(descriptor(&profile, "generate", catalog));
         if profile.id == "sdxl" {
             tools.push(descriptor(&profile, "upscale", catalog));
@@ -435,18 +491,25 @@ pub fn descriptors(catalog: &MetadataOverride) -> Value {
     }
     json!({"tools":tools})
 }
+pub fn descriptors(catalog: &MetadataOverride) -> Value {
+    descriptors_for(catalog, false)
+}
 pub fn prepare(
     tool: &str,
     params: &Value,
     catalog: &MetadataOverride,
 ) -> Result<(Profile, String, Value)> {
-    let list = descriptors(catalog);
+    let list = descriptors_for(catalog, true);
     let descriptor = list["tools"]
         .as_array()
         .unwrap()
         .iter()
         .find(|t| t["id"] == tool)
         .context("Unknown tool")?;
+    ensure!(
+        descriptor["status"] != "needs_setup",
+        "Model is not downloaded; open the Draw Things manager to download it"
+    );
     let mut values = params.clone();
     ensure!(values.is_object(), "Parameters must be an object");
     // Accept the existing Stimma LoRA payload spelling as well as canonical STP.

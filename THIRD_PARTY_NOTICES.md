@@ -44,10 +44,8 @@ contains the compiled dependencies' license texts and attributions, generated
 with `cargo-about` using `about.toml` and `tools/licenses.hbs`.
 Build-only and test-only tools are not part of the shipped executable.
 
-## Manager artwork and fonts
+## Manager artwork
 
-The Draw Things app icons are from [drawthings.ai](https://drawthings.ai/images/webclip.png), used to identify the connected provider. Draw Things branding belongs to Draw Things, Inc.
+`manager-ui/public/drawthings.png` is a 128-pixel copy of the official Draw Things app icon, used to identify the connected provider. Draw Things branding belongs to Draw Things, Inc.
 
-General Sans is by Indian Type Foundry, obtained from [Fontshare](https://www.fontshare.com/fonts/general-sans) for the manager interface. Its [font license](vendor/fonts/LICENSE.txt) accompanies the application.
-
-The manager uses Vue (MIT), with build dependencies Vite (MIT), Tailwind CSS (MIT), PostCSS (MIT), and Autoprefixer (MIT). See `manager-ui/package-lock.json` for the pinned build dependency graph.
+The manager uses Vue (MIT), with build dependencies Vite (MIT) and the Vue Vite plugin (MIT). See `manager-ui/package-lock.json` for the pinned build dependency graph. Its stylesheet mirrors the ComfyUI-Stimma manager, which shares this project's license.

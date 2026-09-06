@@ -1,7 +1,7 @@
-A built-in Draw Things manager, available from Stimma’s provider toolbar or a browser.
+The Draw Things manager now matches the ComfyUI manager: same layout, controls, and Atelier palette inside Stimma's provider popover and in a browser.
 
-The overview shows engine controls and live Mac workload metrics: GPU utilization, unified memory, memory pressure, GPU allocations, compression, and swap.
+Tools lists every supported model with its task types, shows which are downloaded, and downloads the rest with one click. Each tool has a dependency view (checkpoint, text encoders, autoencoder, experts) with sizes, missing files, and free disk space, plus the other published versions of the model. Overview shows GPU utilization, unified memory, memory pressure, engine memory, and running generations in the same tiles the ComfyUI manager uses.
 
-Models has a downloaded library with checkpoint sizes and a separate browser for choosing model versions. Downloads show progress and cancellation beside the selected version. Activity tracks generations and setup operations.
+Stimma only receives tools whose checkpoint is downloaded, and each tool offers only its downloaded checkpoint versions. Hosts that advertise STP `tool_status` receive the remaining tools flagged `needs_setup`. Nothing downloads on first generation; the manager owns downloads.
 
-The manager ships inside the existing executable, follows Stimma’s light and dark themes, and requires no additional installation. Authentication remains optional. The existing 28 model-specific STP tools are unchanged.
+The provider icon is a small copy of the Draw Things app icon, embedded as a data URI so hosts show it without fetching anything.
