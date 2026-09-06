@@ -54,10 +54,14 @@ and are not included in releases.
 
 ## Compatibility boundaries
 
-The published generation schema exposes the pinned native configuration fields;
-there is no promise of quality defaults for every generic model or support for
-future upstream schema extensions. Native expert tools and uncommon combinations
-need model-specific settings. Compression must be disabled on attached engines.
+The 28 named tools are checked for valid defaults, required media, rejected generic
+IDs, family-filtered LoRAs, embedded versus CFG guidance, frame quantization,
+expert pairing, and FlatBuffer configuration serialization. FLUX Dev, Chroma,
+Anima, Qwen, Wan 2.2, and SeedVR2 additions have not been swept with live inference.
+These checks establish parameter and transport behavior, not output quality or
+successful inference on every new model. The live table above records the earlier
+capability checks; the split LTX I2V IDs use that existing inference path.
+Compression must be disabled on attached engines.
 Trusted-certificate HTTPS transport is implemented; self-signed desktop TLS and
 all remote hardware combinations have not been live-tested.
 

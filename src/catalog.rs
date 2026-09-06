@@ -1,7 +1,6 @@
 use crate::{proto::MetadataOverride, store};
 use anyhow::{ensure, Context, Result};
 use serde_json::{json, Value};
-use std::collections::BTreeMap;
 
 pub const SAMPLERS: [&str; 20] = [
     "DPM++ 2M Karras",
@@ -34,6 +33,8 @@ pub struct Profile {
     pub inpaint: bool,
     pub defaults: Value,
     pub files: Vec<String>,
+    pub spec: Value,
+    pub version: String,
 }
 fn family(m: &Value) -> String {
     let file = m["file"].as_str().unwrap_or("");
@@ -57,13 +58,7 @@ fn family(m: &Value) -> String {
             "ltx-2.3"
         }
         .into(),
-        v if ["wan", "ltx", "cosmos", "hunyuan_video", "svd"]
-            .iter()
-            .any(|p| v.starts_with(p)) =>
-        {
-            "native-video".into()
-        }
-        _ => "native-image".into(),
+        _ => String::new(),
     }
 }
 pub fn profiles(catalog: &MetadataOverride) -> Vec<Profile> {
@@ -74,22 +69,63 @@ pub fn profiles(catalog: &MetadataOverride) -> Vec<Profile> {
         .filter(|m| m["stp_installed"] == true)
         .filter_map(|m| m["file"].as_str().map(str::to_owned))
         .collect();
-    let mut groups: BTreeMap<String, Vec<String>> = BTreeMap::new();
-    for model in store::array(&catalog.models) {
-        if let Some(file) = model["file"].as_str() {
-            if file == "flux_2_klein_9b_i8x.ckpt" || file.contains("refiner") {
-                continue;
-            }
-            groups.entry(family(&model)).or_default().push(file.into());
-        }
-    }
-    groups.into_iter().map(|(id,mut files)|{
-        files.sort_by_key(|f|(!installed.contains(f),!f.contains("q8p"),f.contains("i8"),f.contains("kv"),f.len(),f.clone()));files.dedup();
-        let spec=&specs[&id];let video=spec["kind"]=="video"||id=="native-video";
-        let defaults=if spec.is_null(){json!({"width":1024,"height":1024,"steps":20,"guidance":5.0,"sampler":"DPM++ 2M Karras","fps":24,"negative_prompt":""})}else{spec["defaults"].clone()};
-        Profile{name:spec["display_name"].as_str().unwrap_or(if video{"Draw Things Native Video"}else{"Draw Things Native Image"}).into(),image:spec["supports_image"]==true||id=="sdxl"||id.starts_with("native-"),inpaint:spec["supports_inpaint"]==true||id=="native-image",id,video,defaults,files}
-    }).collect()
+    let models = store::array(&catalog.models);
+    specs
+        .as_object()
+        .unwrap()
+        .iter()
+        .filter_map(|(id, spec)| {
+            let mut files: Vec<String> = models
+                .iter()
+                .filter(|model| {
+                    let file = model["file"].as_str().unwrap_or("");
+                    if file == "flux_2_klein_9b_i8x.ckpt" || file.contains("refiner") {
+                        return false;
+                    }
+                    if let Some(files) = spec["files"].as_array() {
+                        return model["version"] == spec["version"]
+                            && files.iter().any(|f| f == file);
+                    }
+                    if let Some(prefix) = spec["prefix"].as_str() {
+                        model["version"] == spec["version"]
+                            && file.starts_with(prefix)
+                            && (id != "flux1-dev" || !file.contains("de_distill"))
+                    } else {
+                        family(model) == spec["source_profile"].as_str().unwrap_or(id)
+                    }
+                })
+                .filter_map(|m| m["file"].as_str().map(str::to_owned))
+                .collect();
+            files.sort_by_key(|f| {
+                (
+                    !installed.contains(f),
+                    !f.contains("q8p"),
+                    f.contains("i8"),
+                    f.contains("kv"),
+                    f.len(),
+                    f.clone(),
+                )
+            });
+            files.dedup();
+            let first = files.first()?;
+            let version = models.iter().find(|m| m["file"] == *first)?["version"]
+                .as_str()?
+                .to_owned();
+            Some(Profile {
+                id: id.clone(),
+                name: spec["display_name"].as_str().unwrap().into(),
+                video: spec["kind"] == "video",
+                image: spec["supports_image"] == true,
+                inpaint: spec["supports_inpaint"] == true,
+                defaults: spec["defaults"].clone(),
+                files,
+                spec: spec.clone(),
+                version,
+            })
+        })
+        .collect()
 }
+
 fn number(default: Value, min: f64, max: f64, integer: bool) -> Value {
     json!({"type":if integer{"integer"}else{"number"},"default":default,"minimum":min,"maximum":max,"x-control":"slider"})
 }
@@ -102,10 +138,17 @@ fn names(bytes: &[u8]) -> Vec<String> {
         .filter_map(|m| m["file"].as_str().map(str::to_owned))
         .collect()
 }
+fn compatible(bytes: &[u8], version: &str) -> Vec<String> {
+    store::array(bytes)
+        .iter()
+        .filter(|m| m["version"] == version)
+        .filter_map(|m| m["file"].as_str().map(str::to_owned))
+        .collect()
+}
 fn descriptor(profile: &Profile, mode: &str, catalog: &MetadataOverride) -> Value {
     let d = &profile.defaults;
     let mut props = serde_json::Map::new();
-    props.insert("prompt".into(),json!({"type":"string","x-control":"prompt_editor","description":"Describe the desired output. Ideogram Fast works best with its structured JSON caption format."}));
+    props.insert("prompt".into(),json!({"type":"string","x-control":"prompt_editor","description":"Describe the desired output."}));
     props.insert("negative_prompt".into(),json!({"type":"string","default":d["negative_prompt"].as_str().unwrap_or(""),"x-control":"textarea"}));
     props.insert("checkpoint".into(),json!({"type":"string","enum":profile.files,"default":profile.files[0],"x-control":"dropdown"}));
     for key in ["width", "height"] {
@@ -123,22 +166,47 @@ fn descriptor(profile: &Profile, mode: &str, catalog: &MetadataOverride) -> Valu
     );
     props.insert(
         "sampler".into(),
-        json!({"type":"string","enum":SAMPLERS,"default":d["sampler"],"x-control":"dropdown"}),
+        json!({"type":"string","enum":if profile.id == "sdxl" { SAMPLERS.to_vec() } else { vec!["Euler A Trailing", "DPM++ 2M Trailing", "DDIM Trailing", "UniPC Trailing", "UniPC AYS", "TCD Trailing"] },"default":d["sampler"],"x-control":"dropdown"}),
     );
+    if profile.id == "ideogram-4-fast" {
+        props.get_mut("prompt").unwrap()["description"] = json!("Describe the output using Ideogram Fast's structured JSON caption format for best results.");
+    }
+    if profile.spec["guidance_mode"] == "embedded" {
+        let mut guidance = props.remove("guidance").unwrap();
+        guidance["description"] =
+            json!("Distilled embedded guidance; CFG is fixed at 1 for this profile.");
+        props.insert("guidance_embed".into(), guidance);
+        props.remove("negative_prompt");
+    }
+    if profile.id != "sdxl" {
+        props.insert("shift".into(), number(d["shift"].clone(), 0.1, 20.0, false));
+    }
     let mut required = vec!["prompt"];
+    let needs_image = profile.spec["requires_image"] == true || mode != "generate";
+    if needs_image {
+        required.push("input_images");
+    }
     if profile.image || mode != "generate" {
         props.insert(
             "input_images".into(),
             image_array(
-                if profile.id == "flux2-klein-9b" && mode == "generate" {
-                    10
+                if mode == "generate" {
+                    profile.spec["max_images"].as_u64().unwrap_or(1) as usize
                 } else {
                     1
                 },
-                mode != "generate",
+                needs_image,
             ),
         );
         props.insert("strength".into(), number(json!(1.0), 0.0, 1.0, false));
+    }
+    if needs_image {
+        props
+            .get_mut("input_images")
+            .unwrap()
+            .as_object_mut()
+            .unwrap()
+            .remove("default");
     }
     if mode == "inpaint" {
         required.extend(["input_images", "mask"]);
@@ -168,7 +236,7 @@ fn descriptor(profile: &Profile, mode: &str, catalog: &MetadataOverride) -> Valu
         }
     }
     props.insert("loras".into(),json!({"type":"array","default":[],"maxItems":10,"x-control":"lora_picker","items":{"type":"object","required":["path"],"properties":{
-        "path":{"type":"string","enum":names(&catalog.loras),"x-accept-upload":{"extensions":[".safetensors"],"max_size":2147483648u64}},
+        "path":{"type":"string","enum":compatible(&catalog.loras, &profile.version),"x-accept-upload":{"extensions":[".safetensors"],"max_size":2147483648u64}},
         "weight":{"type":"number","minimum":-4,"maximum":4,"default":1.0},"mode":{"type":"string","enum":["all","base","refiner"],"default":"all"}}}}));
     if !profile.video {
         let mut upscalers = vec![String::new()];
@@ -184,8 +252,12 @@ fn descriptor(profile: &Profile, mode: &str, catalog: &MetadataOverride) -> Valu
     }
     props.insert("control_images".into(), image_array(4, false));
     props.insert("controls".into(),json!({"type":"array","default":[],"maxItems":4,"description":"One control per control_images entry, in the same order. Supply preprocessed control images.","items":{"type":"object","required":["path"],"additionalProperties":false,"properties":{
-        "path":{"type":"string","enum":names(&catalog.control_nets)},"hint_type":{"type":"string","enum":["custom","depth","canny","scribble","pose","normalbae","color","lineart","softedge","seg","inpaint","ip2p","shuffle","mlsd","tile","blur","lowquality","gray"]},
+        "path":{"type":"string","enum":compatible(&catalog.control_nets, &profile.version)},"hint_type":{"type":"string","enum":["custom","depth","canny","scribble","pose","normalbae","color","lineart","softedge","seg","inpaint","ip2p","shuffle","mlsd","tile","blur","lowquality","gray"]},
         "weight":{"type":"number","default":1.0,"minimum":0,"maximum":2},"guidance_start":{"type":"number","default":0,"minimum":0,"maximum":1},"guidance_end":{"type":"number","default":1,"minimum":0,"maximum":1},"mode":{"type":"string","default":"balanced","enum":["balanced","prompt","control"]}}}}));
+    if compatible(&catalog.control_nets, &profile.version).is_empty() {
+        props.remove("controls");
+        props.remove("control_images");
+    }
     if profile.video {
         props.insert("duration".into(), number(json!(5.0), 0.125, 20.0, false));
         props.insert(
@@ -194,29 +266,90 @@ fn descriptor(profile: &Profile, mode: &str, catalog: &MetadataOverride) -> Valu
         );
         props.insert("generate_audio".into(),json!({"type":"boolean","default":true,"description":"Include native returned audio in the video; this does not disable engine audio inference."}));
     }
+    if profile.spec["refiner"] == true {
+        let mut schema = number(d["refiner_start"].clone(), 0.0, 1.0, false);
+        schema["description"] = json!(
+            "Fraction of the sampling schedule where the matching low-noise expert takes over."
+        );
+        props.insert("refiner_start".into(), schema);
+    }
+    if profile.spec["restoration"] == true {
+        required = vec!["input_images"];
+        props.get_mut("prompt").unwrap()["default"] = json!("");
+        for key in [
+            "prompt",
+            "negative_prompt",
+            "guidance",
+            "shift",
+            "sampler",
+            "steps",
+            "strength",
+            "loras",
+            "controls",
+            "control_images",
+            "upscaler",
+            "upscaler_scale_factor",
+        ] {
+            props.remove(key);
+        }
+    }
+    if profile.spec["audio"] != true {
+        props.remove("generate_audio");
+    }
     let mut native: Value = serde_json::from_str(include_str!(concat!(
         env!("OUT_DIR"),
         "/native_schema.json"
     )))
     .expect("native schema");
-    for key in [
-        "id",
-        "name",
-        "model",
-        "start_width",
-        "start_height",
-        "steps",
-        "seed",
-        "guidance_scale",
-        "batch_count",
-        "batch_size",
-        "controls",
-        "loras",
-    ] {
-        native["properties"].as_object_mut().unwrap().remove(key);
-    }
+    // An explicit per-profile escape hatch, never the whole engine configuration.
+    native["properties"]
+        .as_object_mut()
+        .unwrap()
+        .retain(|key, _| {
+            let common = [
+                "tiled_decoding",
+                "decoding_tile_width",
+                "decoding_tile_height",
+                "decoding_tile_overlap",
+                "tiled_diffusion",
+                "diffusion_tile_width",
+                "diffusion_tile_height",
+                "diffusion_tile_overlap",
+                "tea_cache",
+                "tea_cache_start",
+                "tea_cache_end",
+                "tea_cache_threshold",
+                "tea_cache_max_skip_steps",
+            ];
+            common.contains(&key.as_str())
+                || (profile.id == "sdxl"
+                    && [
+                        "clip_skip",
+                        "separate_clip_l",
+                        "clip_l_text",
+                        "separate_open_clip_g",
+                        "open_clip_g_text",
+                        "aesthetic_score",
+                        "negative_aesthetic_score",
+                        "zero_negative_prompt",
+                        "crop_top",
+                        "crop_left",
+                        "negative_original_image_width",
+                        "negative_original_image_height",
+                    ]
+                    .contains(&key.as_str()))
+                || (profile.id.starts_with("ltx-")
+                    && [
+                        "hires_fix",
+                        "hires_fix_start_width",
+                        "hires_fix_start_height",
+                        "hires_fix_strength",
+                    ]
+                    .contains(&key.as_str()))
+                || (mode == "inpaint" && key == "preserve_original_after_inpaint")
+        });
     native["default"] = json!({});
-    native["description"]=json!("Advanced native Draw Things settings. Tile and hires dimensions use native 64-pixel units. These override profile defaults. Model-specific support is determined by the engine.");
+    native["description"]=json!("Advanced native Draw Things settings. Tile and hires dimensions use native 64-pixel units. These override profile defaults. Only settings selected for this tool are exposed.");
     props.insert("native_configuration".into(), native);
     if mode == "upscale" {
         required = vec!["input_images"];
@@ -235,6 +368,9 @@ fn descriptor(profile: &Profile, mode: &str, catalog: &MetadataOverride) -> Valu
     } else {
         "text-to-image"
     }];
+    if profile.spec["requires_image"] == true {
+        tasks.clear();
+    }
     if profile.image {
         tasks.push(if profile.video {
             "image-to-video"
@@ -247,7 +383,7 @@ fn descriptor(profile: &Profile, mode: &str, catalog: &MetadataOverride) -> Valu
     } else if mode == "outpaint" {
         tasks = vec!["outpaint-image"];
     }
-    if mode == "upscale" {
+    if mode == "upscale" || profile.spec["restoration"] == true {
         tasks = vec!["upscale-image"];
     }
     let advanced: Vec<_> = props
@@ -283,7 +419,7 @@ fn descriptor(profile: &Profile, mode: &str, catalog: &MetadataOverride) -> Valu
     .filter(|k| props.contains_key(*k))
     .map(|k| json!({"name":k}))
     .collect();
-    json!({"id":id,"name":if mode=="generate"{profile.name.clone()}else{format!("{} {mode}",profile.name)},"task_types":tasks,"description":if profile.id.starts_with("native-"){ "Advanced access to additional Draw Things model families. Select native settings appropriate to the checkpoint." }else{"Generate locally with Draw Things; missing official checkpoints download on first use."},"parameter_schema":{"type":"object","required":required,"additionalProperties":false,"properties":props},"output_schema":{"type":"object","required":["assets"],"properties":{"assets":{"type":"array","items":{"type":"object"}}}},"layout":[{"label":"Generation","params":main},{"label":"Advanced","collapsed":true,"params":advanced}]})
+    json!({"id":id,"name":if mode=="generate"{profile.name.clone()}else{format!("{} {mode}",profile.name)},"task_types":tasks,"description":"Generate locally with Draw Things; missing official checkpoints download on first use.","parameter_schema":{"type":"object","required":required,"additionalProperties":false,"properties":props},"output_schema":{"type":"object","required":["assets"],"properties":{"assets":{"type":"array","items":{"type":"object"}}}},"layout":[{"label":"Generation","params":main},{"label":"Advanced","collapsed":true,"params":advanced}]})
 }
 pub fn descriptors(catalog: &MetadataOverride) -> Value {
     let mut tools = vec![];
@@ -348,6 +484,12 @@ pub fn prepare(
         .into_iter()
         .find(|p| p.id == family)
         .context("Missing profile")?;
+    if profile.spec["restoration"] == true {
+        values["prompt"] = json!("");
+        for key in ["steps", "guidance", "sampler", "shift"] {
+            values[key] = profile.defaults[key].clone();
+        }
+    }
     Ok((profile, mode.into(), values))
 }
 pub fn validate(schema: &Value, value: &Value, path: &str) -> Result<()> {

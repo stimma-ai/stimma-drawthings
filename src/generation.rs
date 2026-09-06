@@ -37,8 +37,19 @@ pub fn configuration(profile: &Profile, p: &Value, has_image: bool) -> Result<(V
     config["start_height"] = json!(p["height"].as_u64().context("height missing")? / 64);
     config["seed"] = p["seed"].clone();
     config["steps"] = p["steps"].clone();
-    config["guidance_scale"] = p["guidance"].clone();
+    config["guidance_scale"] = p.get("guidance").cloned().unwrap_or(json!(1.0));
+    if let Some(v) = p.get("guidance_embed") {
+        config["guidance_embed"] = v.clone();
+    }
+    if let Some(v) = p.get("shift") {
+        config["shift"] = v.clone();
+    }
     config["model"] = p["checkpoint"].clone();
+    if profile.spec["refiner"] == true {
+        config["refiner_model"] =
+            json!(p["checkpoint"].as_str().unwrap().replace("_hne_", "_lne_"));
+        config["refiner_start"] = p["refiner_start"].clone();
+    }
     config["strength"] = if has_image {
         p.get("strength").cloned().unwrap_or(json!(1.0))
     } else {
@@ -70,8 +81,13 @@ pub fn configuration(profile: &Profile, p: &Value, has_image: bool) -> Result<(V
     if profile.video {
         let fps = p["fps"].as_u64().context("fps missing")?;
         let duration = p["duration"].as_f64().context("duration missing")?;
-        let frames = (((duration * fps as f64) / 8.0).round() as u64) * 8 + 1;
-        ensure!(frames <= 201, "Requested video exceeds 201 frames");
+        let quantum = profile.spec["frame_quantum"].as_u64().unwrap_or(8);
+        let max_frames = profile.spec["max_frames"].as_u64().unwrap_or(201);
+        let frames = (((duration * fps as f64) / quantum as f64).round() as u64) * quantum + 1;
+        ensure!(
+            frames <= max_frames,
+            "Requested video exceeds {max_frames} frames"
+        );
         config["fps_id"] = json!(fps);
         config["num_frames"] = json!(frames);
     }
@@ -133,8 +149,14 @@ pub async fn execute(
         .context("Checkpoint missing")?
         .to_owned();
     store::ensure_model(runtime, &catalog, &checkpoint, progress).await?;
-    if let Some(refiner) = p["native_configuration"]["refiner_model"].as_str() {
-        store::ensure_model(runtime, &catalog, refiner, progress).await?;
+    if profile.spec["refiner"] == true {
+        store::ensure_model(
+            runtime,
+            &catalog,
+            &checkpoint.replace("_hne_", "_lne_"),
+            progress,
+        )
+        .await?;
     }
     let width = p["width"].as_u64().unwrap() as u32;
     let height = p["height"].as_u64().unwrap() as u32;
@@ -195,13 +217,22 @@ pub async fn execute(
         if i == 0 {
             request.image = Some(encoded);
         } else {
-            request.hints.push(proto::HintProto {
-                hint_type: "shuffle".into(),
-                tensors: vec![proto::TensorAndWeight {
+            if !request.hints.iter().any(|h| h.hint_type == "shuffle") {
+                request.hints.push(proto::HintProto {
+                    hint_type: "shuffle".into(),
+                    tensors: vec![],
+                });
+            }
+            request
+                .hints
+                .iter_mut()
+                .find(|h| h.hint_type == "shuffle")
+                .unwrap()
+                .tensors
+                .push(proto::TensorAndWeight {
                     tensor: encoded,
                     weight: 1.0,
-                }],
-            });
+                });
         }
     }
     if mode == "inpaint" {

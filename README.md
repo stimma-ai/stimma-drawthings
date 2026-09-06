@@ -65,18 +65,19 @@ Use the actual port shown by Draw Things. The same option connects to a standalo
 
 ## Tools and native settings
 
-Profiles include Z-Image Turbo, FLUX.2 Klein 9B, Krea 2 Turbo, Ideogram 4 / Fast / Instant, SDXL, and LTX-2.3 / Distilled. Additional catalog models appear through `native-image` and `native-video` expert tools; those require model-appropriate settings rather than universal quality defaults.
+The provider publishes **28 specific tools**. There are no generic image/video tools or arbitrary-checkpoint fallback. Each tool selects compatible checkpoints and exposes its own parameters. See the [ComfyUI coverage table](docs/CATALOG.md) for the 21 of 45 reference workflows covered at the model/task level and the remaining gaps.
 
-- Text-to-image and compatible image-to-image models; multiple reference images for Klein.
-- Masked inpainting and outpainting for Klein, SDXL, and compatible native image models.
-- Text-to-video and image-to-video, with native generated audio encoded into MP4.
-- LoRA selection, weights, and safetensors upload/conversion through STP's file-upload handshake.
-- Paired control images and ControlNet/T2I/IP-Adapter metadata; supply the appropriate control image for the selected hint.
-- Native upscalers, including `sdxl-upscale` for zero-strength upscaling without diffusion.
-- Typed `native_configuration` for the pinned Draw Things generation schema: refiners, hires fix, tiling, separate text encoders, sampling controls, cache settings, and other native options.
-- Execution progress, approximate latent previews for supported image formats, queued jobs, cancellation, and image/video asset transfer.
+- Z-Image Turbo, FLUX.1 Dev, FLUX.2 Dev/Klein 9B, Chroma HD, Anima Base, Krea 2 Turbo, Ideogram 4/Fast/Instant, SDXL, Qwen Image/2512 and Edit 2509/2511.
+- Klein and SDXL inpainting/outpainting; SDXL Real-ESRGAN upscaling; SeedVR2 3B/7B image restoration.
+- Separate LTX-2.3/Distilled text-to-video and image-to-video tools with audio; Wan 2.2 T2V/I2V with paired high/low-noise experts.
+- Family-filtered LoRA selection and safetensors upload/conversion. Compatible ControlNets and preprocessed control images appear only where available.
+- Progress, approximate latent previews, queued jobs, cancellation, and image/video asset transfer.
 
-Inspect exact parameters and enums with `stp show TOOL`, or emit all schemas with `stimma-drawthings --schemas`. Unknown fields, invalid dimensions, invalid enum values, and mismatched LoRA/control families produce errors. Advanced settings still need to make sense for the selected engine model. Native tile and hires dimensions use **64-pixel units**. Videos use the engine's frame quantization and are limited to 201 frames.
+Inspect exact parameters with `stp show TOOL`, or emit all schemas with `stimma-drawthings --schemas`. `guidance` means CFG; FLUX Dev tools instead expose `guidance_embed` and fix CFG at 1. Edit/I2V/restoration tools require source images. Wan has no audio toggle. SeedVR2 fixes its one-step restoration settings and exposes target width/height rather than unused sampling controls. Source images are resized to the requested dimensions.
+
+`native_configuration` contains a restricted per-tool set of advanced settings, such as tiling, caching, SDXL text conditioning, and LTX hires fix. It cannot override the selected model, sampler, frame count, or batching. Native tile/hires dimensions use **64-pixel units**. LTX uses 8n+1 frames (maximum 201); Wan uses 4n+1 (maximum 81). Duration and fps combinations exceeding those limits are rejected.
+
+New profiles are schema/serialization-tested, **not individually live-generation validated**. The earlier live checks, including SDXL LoRA upload/conversion/generation, are documented in [validation](docs/VALIDATION.md).
 
 Examples below use a persistent provider:
 

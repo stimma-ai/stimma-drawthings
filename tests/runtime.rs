@@ -10,7 +10,7 @@ fn advanced_configuration_survives_wire_roundtrip() {
         .unwrap(),
         ..Default::default()
     };
-    let (profile, _, p) = catalog::prepare("sdxl", &json!({"prompt":"test", "native_configuration":{"tiled_decoding":true,"decoding_tile_width":8,"separate_clip_l":true,"clip_l_text":"alternate","sampler":"EulerA","tea_cache":true}}), &models).unwrap();
+    let (profile, _, p) = catalog::prepare("sdxl", &json!({"prompt":"test", "native_configuration":{"tiled_decoding":true,"decoding_tile_width":8,"separate_clip_l":true,"clip_l_text":"alternate","tea_cache":true}}), &models).unwrap();
     let (wire, _) = generation::configuration(&profile, &p, false).unwrap();
     let c = stimma_drawthings::generated::stimma_drawthings::_generated::config::root_as_generation_configuration(&wire).unwrap();
     assert!(c.tiled_decoding());

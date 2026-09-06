@@ -193,6 +193,14 @@ fn prepare_upload(
         "LoRA must be at most 2 GiB"
     );
     let tool = params["tool_id"].as_str().context("tool_id required")?;
+    ensure!(
+        catalog::descriptors(catalog)["tools"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|t| t["id"] == tool && t["parameter_schema"]["properties"].get("loras").is_some()),
+        "Tool does not accept LoRA uploads"
+    );
     let (family, _) = tool
         .split_once("-inpaint")
         .or_else(|| tool.split_once("-outpaint"))

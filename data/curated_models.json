@@ -11,7 +11,11 @@
       "default_scale": 16,
       "hires_fix_scale": 32,
       "padded_text_encoding_length": 512,
-      "objective": {"u": {"condition_scale": 1000}}
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      }
     },
     {
       "name": "Z Image Turbo 1.0",
@@ -22,7 +26,11 @@
       "autoencoder": "flux_1_vae_f16.ckpt",
       "default_scale": 16,
       "hires_fix_scale": 24,
-      "objective": {"u": {"condition_scale": 1000}}
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      }
     },
     {
       "name": "SDXL Base v1.0 (8-bit)",
@@ -46,10 +54,20 @@
       "default_scale": 12,
       "hires_fix_scale": 24,
       "latents_upscalers": [
-        {"file": "ltx_2.3_spatial_upscaler_x2_1.1_f16.ckpt", "scale": "2"},
-        {"file": "ltx_2.3_spatial_upscaler_x1.5_f16.ckpt", "scale": "1.5"}
+        {
+          "file": "ltx_2.3_spatial_upscaler_x2_1.1_f16.ckpt",
+          "scale": "2"
+        },
+        {
+          "file": "ltx_2.3_spatial_upscaler_x1.5_f16.ckpt",
+          "scale": "1.5"
+        }
       ],
-      "objective": {"u": {"condition_scale": 1000}}
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      }
     },
     {
       "name": "LTX-2.3 22B [dev]",
@@ -63,10 +81,1113 @@
       "default_scale": 12,
       "hires_fix_scale": 24,
       "latents_upscalers": [
-        {"file": "ltx_2.3_spatial_upscaler_x2_1.1_f16.ckpt", "scale": "2"},
-        {"file": "ltx_2.3_spatial_upscaler_x1.5_f16.ckpt", "scale": "1.5"}
+        {
+          "file": "ltx_2.3_spatial_upscaler_x2_1.1_f16.ckpt",
+          "scale": "2"
+        },
+        {
+          "file": "ltx_2.3_spatial_upscaler_x1.5_f16.ckpt",
+          "scale": "1.5"
+        }
       ],
-      "objective": {"u": {"condition_scale": 1000}}
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      }
+    },
+    {
+      "name": "Anima Base 1.0",
+      "version": "cosmos2.5_2b",
+      "autoencoder": "qwen_image_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "clip_encoder": "anima_base_1.0_f16.ckpt",
+      "file": "anima_base_1.0_f16.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_0.6b_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "objective": {
+        "u": {
+          "condition_scale": 1
+        }
+      },
+      "padded_text_encoding_length": 512,
+      "note": "[Anima](https://huggingface.co/circlestone-labs/Anima) is a 2B text-to-image model from CircleStone Labs and Comfy Org, focused on anime concepts, characters, styles, illustrations, and other non-photorealistic art. Preview 3 is an intermediate checkpoint built on NVIDIA Cosmos and released under the CircleStone Labs non-commercial license. It is intended for around 1MP generation, with 30-50 sampling steps and CFG 4-5 recommended.",
+      "copyright": "\u00a9 2026 CircleStone Labs",
+      "hugging_face_link": "circlestone-labs/Anima"
+    },
+    {
+      "name": "Anima Base 1.0 (8-bit)",
+      "version": "cosmos2.5_2b",
+      "autoencoder": "qwen_image_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "clip_encoder": "anima_base_1.0_q8p.ckpt",
+      "file": "anima_base_1.0_q8p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_0.6b_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "objective": {
+        "u": {
+          "condition_scale": 1
+        }
+      },
+      "padded_text_encoding_length": 512,
+      "note": "[Anima](https://huggingface.co/circlestone-labs/Anima) is a 2B text-to-image model from CircleStone Labs and Comfy Org, focused on anime concepts, characters, styles, illustrations, and other non-photorealistic art. Preview 3 is an intermediate checkpoint built on NVIDIA Cosmos and released under the CircleStone Labs non-commercial license. It is intended for around 1MP generation, with 30-50 sampling steps and CFG 4-5 recommended.",
+      "copyright": "\u00a9 2026 CircleStone Labs",
+      "hugging_face_link": "circlestone-labs/Anima"
+    },
+    {
+      "name": "Anima Base 1.0 (8-bit S)",
+      "version": "cosmos2.5_2b",
+      "autoencoder": "qwen_image_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "clip_encoder": "anima_base_1.0_i8x.ckpt",
+      "file": "anima_base_1.0_i8x.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_0.6b_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "objective": {
+        "u": {
+          "condition_scale": 1
+        }
+      },
+      "padded_text_encoding_length": 512,
+      "note": "[Anima](https://huggingface.co/circlestone-labs/Anima) is a 2B text-to-image model from CircleStone Labs and Comfy Org, focused on anime concepts, characters, styles, illustrations, and other non-photorealistic art. Preview 3 is an intermediate checkpoint built on NVIDIA Cosmos and released under the CircleStone Labs non-commercial license. It is intended for around 1MP generation, with 30-50 sampling steps and CFG 4-5 recommended.",
+      "copyright": "\u00a9 2026 CircleStone Labs",
+      "hugging_face_link": "circlestone-labs/Anima"
+    },
+    {
+      "name": "FLUX.2 [dev]",
+      "version": "flux2",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "modifier": "kontext",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "flux_2_dev_q8p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "mistral_small_3.2_24b_instruct_2506_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "guidance_embed": true,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "note": "[FLUX.2 [dev]](https://huggingface.co/black-forest-labs/FLUX.2-dev) is a 32 billion parameter rectified flow transformer capable of generating, editing and combining images based on text instructions.",
+      "copyright": "\u00a9 2025 Black Forest Labs",
+      "hugging_face_link": "black-forest-labs/FLUX.2-dev"
+    },
+    {
+      "name": "FLUX.2 [dev] (6-bit)",
+      "version": "flux2",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "modifier": "kontext",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "flux_2_dev_q6p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "mistral_small_3.2_24b_instruct_2506_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "guidance_embed": true,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "note": "[FLUX.2 [dev]](https://huggingface.co/black-forest-labs/FLUX.2-dev) is a 32 billion parameter rectified flow transformer capable of generating, editing and combining images based on text instructions.",
+      "copyright": "\u00a9 2025 Black Forest Labs",
+      "hugging_face_link": "black-forest-labs/FLUX.2-dev"
+    },
+    {
+      "name": "FLUX.2 [dev] (8-bit S)",
+      "version": "flux2",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "modifier": "kontext",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "flux_2_dev_i8x.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "mistral_small_3.2_24b_instruct_2506_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "guidance_embed": true,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "note": "[FLUX.2 [dev]](https://huggingface.co/black-forest-labs/FLUX.2-dev) is a 32 billion parameter rectified flow transformer capable of generating, editing and combining images based on text instructions.",
+      "copyright": "\u00a9 2025 Black Forest Labs",
+      "hugging_face_link": "black-forest-labs/FLUX.2-dev"
+    },
+    {
+      "name": "Qwen Image 2512 (BF16, Exact)",
+      "version": "qwen_image",
+      "autoencoder": "qwen_image_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 24,
+      "file": "qwen_image_2512_bf16.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_2.5_vl_7b_f16.ckpt",
+      "high_precision_autoencoder": false,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "is_bf16": true,
+      "mmdit": {
+        "dual_attention_layers": [],
+        "qk_norm": true,
+        "activation_qk_scaling": {
+          "0": 2,
+          "1": 2,
+          "2": 2,
+          "3": 2,
+          "4": 2,
+          "5": 2,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 2,
+          "11": 2,
+          "12": 2,
+          "13": 2,
+          "14": 2,
+          "15": 2,
+          "16": 2,
+          "17": 2,
+          "18": 2,
+          "19": 2,
+          "20": 2,
+          "21": 2,
+          "22": 2,
+          "23": 2,
+          "24": 2,
+          "25": 2,
+          "26": 2,
+          "27": 2,
+          "28": 2,
+          "29": 2,
+          "30": 2,
+          "31": 2,
+          "32": 2,
+          "33": 2,
+          "34": 2,
+          "35": 2,
+          "36": 2,
+          "37": 2,
+          "38": 2,
+          "39": 2,
+          "40": 2,
+          "41": 2,
+          "42": 2,
+          "43": 2,
+          "44": 2,
+          "45": 2,
+          "46": 2,
+          "47": 2,
+          "48": 2,
+          "49": 2,
+          "50": 2,
+          "51": 2,
+          "52": 2,
+          "53": 2,
+          "54": 2,
+          "55": 2,
+          "56": 2,
+          "57": 2,
+          "58": 2,
+          "59": 2
+        },
+        "activation_ffn_scaling": {
+          "0": 2,
+          "1": 2,
+          "2": 2,
+          "3": 2,
+          "4": 2,
+          "5": 2,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 2,
+          "11": 2,
+          "12": 2,
+          "13": 2,
+          "14": 2,
+          "15": 2,
+          "16": 2,
+          "17": 2,
+          "18": 2,
+          "19": 2,
+          "20": 2,
+          "21": 2,
+          "22": 2,
+          "23": 2,
+          "24": 2,
+          "25": 2,
+          "26": 2,
+          "27": 2,
+          "28": 2,
+          "29": 2,
+          "30": 2,
+          "31": 2,
+          "32": 2,
+          "33": 2,
+          "34": 2,
+          "35": 2,
+          "36": 2,
+          "37": 2,
+          "38": 2,
+          "39": 2,
+          "40": 2,
+          "41": 2,
+          "42": 2,
+          "43": 2,
+          "44": 2,
+          "45": 2,
+          "46": 2,
+          "47": 2,
+          "48": 2,
+          "49": 2,
+          "50": 2,
+          "51": 2,
+          "52": 2,
+          "53": 2,
+          "54": 2,
+          "55": 2,
+          "56": 2,
+          "57": 2,
+          "58": 2,
+          "59": 2
+        }
+      },
+      "note": "[Qwen Image 2512](https://huggingface.co/Qwen/Qwen-Image-2512) is the december update of Qwen Image model with improvements on enhanced human realism, finer natural detail and improved text rendering. It is Apache 2.0-licensed and commercially friendly. The model is trained at multiple resolutions using a Flow Matching objective; trailing samplers yield the best results, with 30\u201350 sampling steps recommended. The BF16 version is only compatible with macOS 15, iOS 18 and above.",
+      "copyright": "\u00a9 2025 Alibaba"
+    },
+    {
+      "name": "FLUX.2 [dev] (Exact)",
+      "version": "flux2",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "modifier": "kontext",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "flux_2_dev_f16.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "mistral_small_3.2_24b_instruct_2506_f16.ckpt",
+      "high_precision_autoencoder": false,
+      "guidance_embed": true,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "note": "[FLUX.2 [dev]](https://huggingface.co/black-forest-labs/FLUX.2-dev) is a 32 billion parameter rectified flow transformer capable of generating, editing and combining images based on text instructions.",
+      "copyright": "\u00a9 2025 Black Forest Labs"
+    },
+    {
+      "name": "Qwen Image 1.0 (BF16, Exact)",
+      "version": "qwen_image",
+      "autoencoder": "qwen_image_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 24,
+      "file": "qwen_image_1.0_bf16.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_2.5_vl_7b_f16.ckpt",
+      "high_precision_autoencoder": false,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "is_bf16": true,
+      "note": "[Qwen Image](https://huggingface.co/Qwen/Qwen-Image) is a state-of-the-art open-source image generation model known for its exceptional text layout and prompt adherence across a wide range of styles, including photorealistic, cartoon, and artistic. It is Apache 2.0-licensed and commercially friendly. The model is trained at multiple resolutions using a Flow Matching objective; trailing samplers yield the best results, with 30\u201350 sampling steps recommended. The BF16 version is only compatible with macOS 15, iOS 18 and above."
+    },
+    {
+      "name": "Qwen Image 1.0 (Exact)",
+      "version": "qwen_image",
+      "autoencoder": "qwen_image_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 24,
+      "file": "qwen_image_1.0_f16.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_2.5_vl_7b_f16.ckpt",
+      "high_precision_autoencoder": false,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "note": "[Qwen Image](https://huggingface.co/Qwen/Qwen-Image) is a state-of-the-art open-source image generation model known for its exceptional text layout and prompt adherence across a wide range of styles, including photorealistic, cartoon, and artistic. It is Apache 2.0-licensed and commercially friendly. The model is trained at multiple resolutions using a Flow Matching objective; trailing samplers yield the best results, with 30\u201350 sampling steps recommended."
+    },
+    {
+      "name": "Qwen Image Edit 2509 (BF16, Exact)",
+      "version": "qwen_image",
+      "autoencoder": "qwen_image_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 24,
+      "file": "qwen_image_edit_2509_bf16.ckpt",
+      "upcast_attention": false,
+      "modifier": "qwenimage_edit_plus",
+      "text_encoder": "qwen_2.5_vl_7b_f16.ckpt",
+      "clip_encoder": "qwen_2.5_vl_7b_vit_f16.ckpt",
+      "high_precision_autoencoder": false,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "is_bf16": true,
+      "note": "[Qwen Image Edit 2509](https://huggingface.co/Qwen/Qwen-Image-2509) is a state-of-the-art open-source image edit model excels at image edit tasks such as background alternation, style transfer, object removal etc. It is Apache 2.0-licensed and commercially friendly. The model is trained at multiple resolutions using a Flow Matching objective; trailing samplers yield the best results, with 30\u201350 sampling steps recommended. This is an update in Sep, 2025. The BF16 version is only compatible with macOS 15, iOS 18 and above."
+    },
+    {
+      "name": "Qwen Image Edit 2509 (Exact)",
+      "version": "qwen_image",
+      "autoencoder": "qwen_image_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 24,
+      "file": "qwen_image_edit_2509_f16.ckpt",
+      "upcast_attention": false,
+      "modifier": "qwenimage_edit_plus",
+      "text_encoder": "qwen_2.5_vl_7b_f16.ckpt",
+      "clip_encoder": "qwen_2.5_vl_7b_vit_f16.ckpt",
+      "high_precision_autoencoder": false,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "note": "[Qwen Image Edit 2509](https://huggingface.co/Qwen/Qwen-Image-2509) is a state-of-the-art open-source image edit model excels at image edit tasks such as background alternation, style transfer, object removal etc. It is Apache 2.0-licensed and commercially friendly. The model is trained at multiple resolutions using a Flow Matching objective; trailing samplers yield the best results, with 30\u201350 sampling steps recommended. This is an update in Sep, 2025."
+    },
+    {
+      "name": "FLUX.1 [dev]",
+      "version": "flux1",
+      "autoencoder": "flux_1_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 24,
+      "file": "flux_1_dev_q8p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "t5_xxl_encoder_q6p.ckpt",
+      "clip_encoder": "clip_vit_l14_f16.ckpt",
+      "high_precision_autoencoder": true,
+      "guidance_embed": true,
+      "padded_text_encoding_length": 512,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "tea_cache_coefficients": [
+        498.651651,
+        -283.781631,
+        55.8554382,
+        -3.82021401,
+        0.264230861
+      ]
+    },
+    {
+      "name": "FLUX.1 [dev] (5-bit)",
+      "version": "flux1",
+      "autoencoder": "flux_1_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 24,
+      "file": "flux_1_dev_q5p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "t5_xxl_encoder_q6p.ckpt",
+      "clip_encoder": "clip_vit_l14_f16.ckpt",
+      "high_precision_autoencoder": true,
+      "guidance_embed": true,
+      "padded_text_encoding_length": 512,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "tea_cache_coefficients": [
+        498.651651,
+        -283.781631,
+        55.8554382,
+        -3.82021401,
+        0.264230861
+      ]
+    },
+    {
+      "name": "FLUX.1 [dev] (Exact)",
+      "version": "flux1",
+      "autoencoder": "flux_1_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 24,
+      "file": "flux_1_dev_f16.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "t5_xxl_encoder_f16.ckpt",
+      "clip_encoder": "clip_vit_l14_f16.ckpt",
+      "high_precision_autoencoder": true,
+      "guidance_embed": true,
+      "padded_text_encoding_length": 512,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "tea_cache_coefficients": [
+        498.651651,
+        -283.781631,
+        55.8554382,
+        -3.82021401,
+        0.264230861
+      ]
+    },
+    {
+      "name": "Chroma1 HD",
+      "version": "flux1",
+      "autoencoder": "flux_1_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 24,
+      "file": "chroma_1_hd_r0.1_q8p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "t5_xxl_encoder_q6p.ckpt",
+      "clip_encoder": "clip_vit_l14_f16.ckpt",
+      "high_precision_autoencoder": true,
+      "padded_text_encoding_length": 256,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "mmdit": {
+        "dual_attention_layers": [],
+        "distilled_guidance_layers": 5,
+        "qk_norm": true
+      },
+      "note": "See more about [Chroma1 HD](https://huggingface.co/lodestones/Chroma1-HD)."
+    },
+    {
+      "name": "Chroma1 HD (5-bit)",
+      "version": "flux1",
+      "autoencoder": "flux_1_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 24,
+      "file": "chroma_1_hd_r0.1_q5p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "t5_xxl_encoder_q6p.ckpt",
+      "clip_encoder": "clip_vit_l14_f16.ckpt",
+      "high_precision_autoencoder": true,
+      "padded_text_encoding_length": 256,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "mmdit": {
+        "dual_attention_layers": [],
+        "distilled_guidance_layers": 5,
+        "qk_norm": true
+      },
+      "note": "See more about [Chroma1 HD](https://huggingface.co/lodestones/Chroma1-HD)."
+    },
+    {
+      "name": "FLUX.1 [dev] De-distill",
+      "version": "flux1",
+      "autoencoder": "flux_1_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 24,
+      "file": "flux_1_dev_de_distill_q8p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "t5_xxl_encoder_q6p.ckpt",
+      "clip_encoder": "clip_vit_l14_f16.ckpt",
+      "high_precision_autoencoder": true,
+      "padded_text_encoding_length": 512,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "tea_cache_coefficients": [
+        498.651651,
+        -283.781631,
+        55.8554382,
+        -3.82021401,
+        0.264230861
+      ]
+    },
+    {
+      "name": "FLUX.1 [dev] De-distill (5-bit)",
+      "version": "flux1",
+      "autoencoder": "flux_1_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 24,
+      "file": "flux_1_dev_de_distill_q5p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "t5_xxl_encoder_q6p.ckpt",
+      "clip_encoder": "clip_vit_l14_f16.ckpt",
+      "high_precision_autoencoder": true,
+      "padded_text_encoding_length": 512,
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "tea_cache_coefficients": [
+        498.651651,
+        -283.781631,
+        55.8554382,
+        -3.82021401,
+        0.264230861
+      ]
+    },
+    {
+      "name": "Qwen Image Edit 2511",
+      "file": "qwen_image_edit_2511_q8p.ckpt",
+      "prefix": "",
+      "version": "qwen_image",
+      "default_scale": 16,
+      "text_encoder": "qwen_2.5_vl_7b_q8p.ckpt",
+      "autoencoder": "qwen_image_vae_f16.ckpt",
+      "modifier": "qwenimage_edit_2511",
+      "clip_encoder": "qwen_2.5_vl_7b_vit_f16.ckpt",
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "hires_fix_scale": 24,
+      "mmdit": {
+        "qk_norm": true,
+        "dual_attention_layers": [],
+        "activation_proj_scaling": {
+          "0": 2,
+          "1": 2,
+          "2": 2,
+          "3": 2,
+          "4": 2,
+          "5": 2,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 2,
+          "11": 2,
+          "12": 2,
+          "13": 2,
+          "14": 2,
+          "15": 2,
+          "16": 2,
+          "17": 2,
+          "18": 2,
+          "19": 2,
+          "20": 2,
+          "21": 2,
+          "22": 2,
+          "23": 2,
+          "24": 2,
+          "25": 2,
+          "26": 2,
+          "27": 2,
+          "28": 2,
+          "29": 2,
+          "30": 2,
+          "31": 2,
+          "32": 2,
+          "33": 2,
+          "34": 2,
+          "35": 2,
+          "36": 2,
+          "37": 2,
+          "38": 2,
+          "39": 2,
+          "40": 2,
+          "41": 2,
+          "42": 2,
+          "43": 2,
+          "44": 2,
+          "45": 2,
+          "46": 2,
+          "47": 2,
+          "48": 2,
+          "49": 2,
+          "50": 2,
+          "51": 2,
+          "52": 2,
+          "53": 2,
+          "54": 2,
+          "55": 2,
+          "56": 2,
+          "57": 2,
+          "58": 2,
+          "59": 2
+        },
+        "activation_ffn_scaling": {
+          "0": 2,
+          "1": 2,
+          "2": 2,
+          "3": 2,
+          "4": 2,
+          "5": 2,
+          "6": 2,
+          "7": 2,
+          "8": 2,
+          "9": 2,
+          "10": 2,
+          "11": 2,
+          "12": 2,
+          "13": 2,
+          "14": 2,
+          "15": 2,
+          "16": 2,
+          "17": 2,
+          "18": 2,
+          "19": 2,
+          "20": 2,
+          "21": 2,
+          "22": 2,
+          "23": 2,
+          "24": 2,
+          "25": 2,
+          "26": 2,
+          "27": 2,
+          "28": 2,
+          "29": 2,
+          "30": 2,
+          "31": 2,
+          "32": 2,
+          "33": 2,
+          "34": 2,
+          "35": 2,
+          "36": 2,
+          "37": 2,
+          "38": 2,
+          "39": 2,
+          "40": 2,
+          "41": 2,
+          "42": 2,
+          "43": 2,
+          "44": 2,
+          "45": 2,
+          "46": 2,
+          "47": 2,
+          "48": 2,
+          "49": 2,
+          "50": 2,
+          "51": 2,
+          "52": 2,
+          "53": 2,
+          "54": 2,
+          "55": 2,
+          "56": 2,
+          "57": 2,
+          "58": 2,
+          "59": 2
+        }
+      }
+    },
+    {
+      "name": "Wan 2.2 HNE T2V",
+      "file": "wan_v2.2_a14b_hne_t2v_q8p.ckpt",
+      "prefix": "",
+      "version": "wan_v2.1_14b",
+      "default_scale": 12,
+      "text_encoder": "umt5_xxl_encoder_q8p.ckpt",
+      "autoencoder": "wan_v2.1_video_vae_f16.ckpt",
+      "hires_fix_scale": 16,
+      "frames_per_second": 16,
+      "tea_cache_coefficients": [
+        -303318.725,
+        49053.7029,
+        -2655.30556,
+        58.7365115,
+        -0.315583525
+      ]
+    },
+    {
+      "name": "Wan 2.2 LNE T2V",
+      "file": "wan_v2.2_a14b_lne_t2v_q8p.ckpt",
+      "prefix": "",
+      "version": "wan_v2.1_14b",
+      "default_scale": 12,
+      "text_encoder": "umt5_xxl_encoder_q8p.ckpt",
+      "autoencoder": "wan_v2.1_video_vae_f16.ckpt",
+      "hires_fix_scale": 16,
+      "frames_per_second": 16,
+      "tea_cache_coefficients": [
+        -303318.725,
+        49053.7029,
+        -2655.30556,
+        58.7365115,
+        -0.315583525
+      ]
+    },
+    {
+      "name": "Wan 2.2 HNE I2V",
+      "file": "wan_v2.2_a14b_hne_i2v_q8p.ckpt",
+      "prefix": "",
+      "version": "wan_v2.1_14b",
+      "default_scale": 12,
+      "text_encoder": "umt5_xxl_encoder_q8p.ckpt",
+      "autoencoder": "wan_v2.1_video_vae_f16.ckpt",
+      "hires_fix_scale": 16,
+      "frames_per_second": 16,
+      "tea_cache_coefficients": [
+        -303318.725,
+        49053.7029,
+        -2655.30556,
+        58.7365115,
+        -0.315583525
+      ],
+      "modifier": "inpainting"
+    },
+    {
+      "name": "Wan 2.2 LNE I2V",
+      "file": "wan_v2.2_a14b_lne_i2v_q8p.ckpt",
+      "prefix": "",
+      "version": "wan_v2.1_14b",
+      "default_scale": 12,
+      "text_encoder": "umt5_xxl_encoder_q8p.ckpt",
+      "autoencoder": "wan_v2.1_video_vae_f16.ckpt",
+      "hires_fix_scale": 16,
+      "frames_per_second": 16,
+      "tea_cache_coefficients": [
+        -303318.725,
+        49053.7029,
+        -2655.30556,
+        58.7365115,
+        -0.315583525
+      ],
+      "modifier": "inpainting"
+    },
+    {
+      "name": "SeedVR2 3B",
+      "file": "seedvr2_3b_q8p.ckpt",
+      "prefix": "",
+      "version": "seedvr2_3b",
+      "default_scale": 24,
+      "text_encoder": "seedvr2_3b_q8p.ckpt",
+      "autoencoder": "seedvr2_vae_f16.ckpt",
+      "modifier": "inpainting",
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "noise_discretization": {
+        "rf": {
+          "_0": {
+            "sigma_min": 0,
+            "sigma_max": 1,
+            "condition_scale": 1000
+          }
+        }
+      },
+      "latents_scaling_factor": 0.9152,
+      "hires_fix_scale": 512
+    },
+    {
+      "name": "SeedVR2 7B",
+      "file": "seedvr2_7b_q8p.ckpt",
+      "prefix": "",
+      "version": "seedvr2_7b",
+      "default_scale": 24,
+      "text_encoder": "seedvr2_7b_q8p.ckpt",
+      "autoencoder": "seedvr2_vae_f16.ckpt",
+      "modifier": "inpainting",
+      "objective": {
+        "u": {
+          "condition_scale": 1000
+        }
+      },
+      "noise_discretization": {
+        "rf": {
+          "_0": {
+            "sigma_min": 0,
+            "sigma_max": 1,
+            "condition_scale": 1000
+          }
+        }
+      },
+      "latents_scaling_factor": 0.9152,
+      "hires_fix_scale": 512
+    },
+    {
+      "name": "Krea 2 Turbo",
+      "version": "krea_2",
+      "autoencoder": "qwen_image_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "krea_2_turbo_q8p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_4b_q8p.ckpt",
+      "clip_encoder": "krea_2_turbo_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Krea 2 Turbo](https://huggingface.co/krea/Krea-2-Turbo) is the post-trained and distilled release of Krea's 12-billion-parameter text-to-image Diffusion Transformer, designed for fast natural-language image generation. Use 8 sampling steps with CFG 1. It is released under the Krea 2 Community License.",
+      "copyright": "\u00a9 2026 Krea.ai, Inc.",
+      "hugging_face_link": "krea/Krea-2-Turbo"
+    },
+    {
+      "name": "Krea 2 Turbo (6-bit)",
+      "version": "krea_2",
+      "autoencoder": "qwen_image_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "krea_2_turbo_q6p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_4b_q8p.ckpt",
+      "clip_encoder": "krea_2_turbo_q6p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Krea 2 Turbo](https://huggingface.co/krea/Krea-2-Turbo) is the post-trained and distilled release of Krea's 12-billion-parameter text-to-image Diffusion Transformer, designed for fast natural-language image generation. Use 8 sampling steps with CFG 1. It is released under the Krea 2 Community License.",
+      "copyright": "\u00a9 2026 Krea.ai, Inc.",
+      "hugging_face_link": "krea/Krea-2-Turbo"
+    },
+    {
+      "name": "Krea 2 Turbo (8-bit S)",
+      "version": "krea_2",
+      "autoencoder": "qwen_image_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "krea_2_turbo_i8x.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_4b_q8p.ckpt",
+      "clip_encoder": "krea_2_turbo_i8x.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Krea 2 Turbo](https://huggingface.co/krea/Krea-2-Turbo) is the post-trained and distilled release of Krea's 12-billion-parameter text-to-image Diffusion Transformer, designed for fast natural-language image generation. Use 8 sampling steps with CFG 1. It is released under the Krea 2 Community License.",
+      "copyright": "\u00a9 2026 Krea.ai, Inc.",
+      "hugging_face_link": "krea/Krea-2-Turbo"
+    },
+    {
+      "name": "Krea 2 Turbo (6-bit S)",
+      "version": "krea_2",
+      "autoencoder": "qwen_image_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "krea_2_turbo_i6x.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_4b_q8p.ckpt",
+      "clip_encoder": "krea_2_turbo_i6x.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Krea 2 Turbo](https://huggingface.co/krea/Krea-2-Turbo) is the post-trained and distilled release of Krea's 12-billion-parameter text-to-image Diffusion Transformer, designed for fast natural-language image generation. Use 8 sampling steps with CFG 1. It is released under the Krea 2 Community License.",
+      "copyright": "\u00a9 2026 Krea.ai, Inc.",
+      "hugging_face_link": "krea/Krea-2-Turbo"
+    },
+    {
+      "name": "Ideogram 4",
+      "version": "ideogram_4",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "ideogram_4_q8p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_8b_instruct_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Ideogram 4](https://huggingface.co/ideogram-ai/ideogram-4-fp8) is a 9.3-billion-parameter open-weight text-to-image foundation model trained from scratch. It excels at multilingual text rendering and design-oriented generation, and supports structured JSON prompts with explicit layout, bounding-box, and color-palette controls. It generates natively at 2K resolution and is released under the Ideogram 4 Non-Commercial license; 48 sampling steps are recommended for highest quality.",
+      "copyright": "\u00a9 2026 Ideogram",
+      "hugging_face_link": "ideogram-ai/ideogram-4-fp8"
+    },
+    {
+      "name": "Ideogram 4 (6-bit)",
+      "version": "ideogram_4",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "ideogram_4_q6p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_8b_instruct_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Ideogram 4](https://huggingface.co/ideogram-ai/ideogram-4-fp8) is a 9.3-billion-parameter open-weight text-to-image foundation model trained from scratch. It excels at multilingual text rendering and design-oriented generation, and supports structured JSON prompts with explicit layout, bounding-box, and color-palette controls. It generates natively at 2K resolution and is released under the Ideogram 4 Non-Commercial license; 48 sampling steps are recommended for highest quality.",
+      "copyright": "\u00a9 2026 Ideogram",
+      "hugging_face_link": "ideogram-ai/ideogram-4-fp8"
+    },
+    {
+      "name": "Ideogram 4 (8-bit S)",
+      "version": "ideogram_4",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "ideogram_4_i8x.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_8b_instruct_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Ideogram 4](https://huggingface.co/ideogram-ai/ideogram-4-fp8) is a 9.3-billion-parameter open-weight text-to-image foundation model trained from scratch. It excels at multilingual text rendering and design-oriented generation, and supports structured JSON prompts with explicit layout, bounding-box, and color-palette controls. It generates natively at 2K resolution and is released under the Ideogram 4 Non-Commercial license; 48 sampling steps are recommended for highest quality.",
+      "copyright": "\u00a9 2026 Ideogram",
+      "hugging_face_link": "ideogram-ai/ideogram-4-fp8"
+    },
+    {
+      "name": "Ideogram 4 (6-bit S)",
+      "version": "ideogram_4",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "ideogram_4_i6x.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_8b_instruct_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Ideogram 4](https://huggingface.co/ideogram-ai/ideogram-4-fp8) is a 9.3-billion-parameter open-weight text-to-image foundation model trained from scratch. It excels at multilingual text rendering and design-oriented generation, and supports structured JSON prompts with explicit layout, bounding-box, and color-palette controls. It generates natively at 2K resolution and is released under the Ideogram 4 Non-Commercial license; 48 sampling steps are recommended for highest quality.",
+      "copyright": "\u00a9 2026 Ideogram",
+      "hugging_face_link": "ideogram-ai/ideogram-4-fp8"
+    },
+    {
+      "name": "Ideogram 4 Instant",
+      "version": "ideogram_4",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "ideogram_4_instant_q8p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_8b_instruct_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Ideogram 4 Instant](https://huggingface.co/fal/ideogram-v4-instant) is an 8-step timestep-distilled variant of the 9.3-billion-parameter Ideogram 4 model. It is designed for the fastest generation while retaining the base model's multilingual text rendering, design-oriented generation, and structured JSON controls. Use 8 sampling steps with CFG 1. It is released under the Ideogram 4 Non-Commercial license.",
+      "copyright": "\u00a9 2026 Features & Labels, Inc.",
+      "hugging_face_link": "fal/ideogram-v4-instant"
+    },
+    {
+      "name": "Ideogram 4 Instant (6-bit)",
+      "version": "ideogram_4",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "ideogram_4_instant_q6p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_8b_instruct_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Ideogram 4 Instant](https://huggingface.co/fal/ideogram-v4-instant) is an 8-step timestep-distilled variant of the 9.3-billion-parameter Ideogram 4 model. It is designed for the fastest generation while retaining the base model's multilingual text rendering, design-oriented generation, and structured JSON controls. Use 8 sampling steps with CFG 1. It is released under the Ideogram 4 Non-Commercial license.",
+      "copyright": "\u00a9 2026 Features & Labels, Inc.",
+      "hugging_face_link": "fal/ideogram-v4-instant"
+    },
+    {
+      "name": "Ideogram 4 Instant (8-bit S)",
+      "version": "ideogram_4",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "ideogram_4_instant_i8x.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_8b_instruct_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Ideogram 4 Instant](https://huggingface.co/fal/ideogram-v4-instant) is an 8-step timestep-distilled variant of the 9.3-billion-parameter Ideogram 4 model. It is designed for the fastest generation while retaining the base model's multilingual text rendering, design-oriented generation, and structured JSON controls. Use 8 sampling steps with CFG 1. It is released under the Ideogram 4 Non-Commercial license.",
+      "copyright": "\u00a9 2026 Features & Labels, Inc.",
+      "hugging_face_link": "fal/ideogram-v4-instant"
+    },
+    {
+      "name": "Ideogram 4 Instant (6-bit S)",
+      "version": "ideogram_4",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "ideogram_4_instant_i6x.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_8b_instruct_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Ideogram 4 Instant](https://huggingface.co/fal/ideogram-v4-instant) is an 8-step timestep-distilled variant of the 9.3-billion-parameter Ideogram 4 model. It is designed for the fastest generation while retaining the base model's multilingual text rendering, design-oriented generation, and structured JSON controls. Use 8 sampling steps with CFG 1. It is released under the Ideogram 4 Non-Commercial license.",
+      "copyright": "\u00a9 2026 Features & Labels, Inc.",
+      "hugging_face_link": "fal/ideogram-v4-instant"
+    },
+    {
+      "name": "Ideogram 4 Fast",
+      "version": "ideogram_4",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "ideogram_4_fast_q8p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_8b_instruct_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Ideogram 4 Fast](https://huggingface.co/fal/ideogram-v4-fast) is a CFG-distilled variant of the 9.3-billion-parameter Ideogram 4 model. It preserves the base model's multilingual text rendering, design-oriented generation, and structured JSON controls while removing the unconditional denoising pass. Use 20 sampling steps with CFG 1. It is released under the Ideogram 4 Non-Commercial license.",
+      "copyright": "\u00a9 2026 Features & Labels, Inc.",
+      "hugging_face_link": "fal/ideogram-v4-fast"
+    },
+    {
+      "name": "Ideogram 4 Fast (6-bit)",
+      "version": "ideogram_4",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "ideogram_4_fast_q6p.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_8b_instruct_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Ideogram 4 Fast](https://huggingface.co/fal/ideogram-v4-fast) is a CFG-distilled variant of the 9.3-billion-parameter Ideogram 4 model. It preserves the base model's multilingual text rendering, design-oriented generation, and structured JSON controls while removing the unconditional denoising pass. Use 20 sampling steps with CFG 1. It is released under the Ideogram 4 Non-Commercial license.",
+      "copyright": "\u00a9 2026 Features & Labels, Inc.",
+      "hugging_face_link": "fal/ideogram-v4-fast"
+    },
+    {
+      "name": "Ideogram 4 Fast (8-bit S)",
+      "version": "ideogram_4",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "ideogram_4_fast_i8x.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_8b_instruct_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Ideogram 4 Fast](https://huggingface.co/fal/ideogram-v4-fast) is a CFG-distilled variant of the 9.3-billion-parameter Ideogram 4 model. It preserves the base model's multilingual text rendering, design-oriented generation, and structured JSON controls while removing the unconditional denoising pass. Use 20 sampling steps with CFG 1. It is released under the Ideogram 4 Non-Commercial license.",
+      "copyright": "\u00a9 2026 Features & Labels, Inc.",
+      "hugging_face_link": "fal/ideogram-v4-fast"
+    },
+    {
+      "name": "Ideogram 4 Fast (6-bit S)",
+      "version": "ideogram_4",
+      "autoencoder": "flux_2_vae_f16.ckpt",
+      "prefix": "",
+      "default_scale": 16,
+      "hires_fix_scale": 32,
+      "file": "ideogram_4_fast_i6x.ckpt",
+      "upcast_attention": false,
+      "text_encoder": "qwen_3_vl_8b_instruct_q8p.ckpt",
+      "high_precision_autoencoder": false,
+      "padded_text_encoding_length": 0,
+      "note": "[Ideogram 4 Fast](https://huggingface.co/fal/ideogram-v4-fast) is a CFG-distilled variant of the 9.3-billion-parameter Ideogram 4 model. It preserves the base model's multilingual text rendering, design-oriented generation, and structured JSON controls while removing the unconditional denoising pass. Use 20 sampling steps with CFG 1. It is released under the Ideogram 4 Non-Commercial license.",
+      "copyright": "\u00a9 2026 Features & Labels, Inc.",
+      "hugging_face_link": "fal/ideogram-v4-fast"
     }
   ],
   "sha256": {
@@ -85,6 +1206,62 @@
     "gemma_3_12b_it_qat_q8p.ckpt": "9292a7107d30b6eef8282654c9746ac2e868a6d00704bdb9cfdadf45d4c325af",
     "ltx_2.3_audio_video_vae_f16.ckpt": "72e4c23b34e631599773b05beb7e355c00d36feb983fe9746d351b58a4be4f02",
     "ltx_2.3_spatial_upscaler_x2_1.1_f16.ckpt": "30f695c0b24a59a6490f1552c025124d713f61d4e6a90da6b0def038c8caa845",
-    "ltx_2.3_spatial_upscaler_x1.5_f16.ckpt": "249f5bd521472a952775e0cb9729836d2fc9ab488ca64e08329e19dd07060157"
+    "ltx_2.3_spatial_upscaler_x1.5_f16.ckpt": "249f5bd521472a952775e0cb9729836d2fc9ab488ca64e08329e19dd07060157",
+    "qwen_image_vae_f16.ckpt": "701e7c46ed6c2fa8036543780317e06d264374f9b4dbfc22f27c0b3181bb988a",
+    "anima_base_1.0_f16.ckpt": "dec00f42a6216dcf053ad8e649cf3029f46c78d27ffe8eb831d69b07f4ae7f9b",
+    "qwen_3_0.6b_q8p.ckpt": "fee6eca8ecbeb8f75fccf553968f6964d5191e3441d925cd89984503ab8a8d64",
+    "anima_base_1.0_q8p.ckpt": "177db8da289009681e153e9907fa8cc87c818dcf3bb05da85bf04d5d0f97adb1",
+    "anima_base_1.0_i8x.ckpt": "2d6bafb04fb0ee7196b553664c58c0fde369e5ea2aa1b9f2e4eeffe9fbbd0dfa",
+    "flux_2_dev_q8p.ckpt": "587e8b69458e02f790b0d51a7d64e1c280012dee4a19fe947e39de6e1f263325",
+    "mistral_small_3.2_24b_instruct_2506_q8p.ckpt": "933bd9275bcd00f22ca7f566aae6714fc1937c90165e86f390905fdf278755c3",
+    "flux_2_dev_q6p.ckpt": "8e61adc54b65a561117a13f551ed7efce2a886633944c52655829e4c71bf9f18",
+    "flux_2_dev_i8x.ckpt": "889c0f5550b561130ce7c4c33c280a822b64aae9ede4ff2fb3464d82d5efd9f8",
+    "qwen_image_2512_bf16.ckpt": "a684429badd94d8e86dfb309c31794ce2fa7e1b95d6904b49a2450dd953d6a37",
+    "qwen_2.5_vl_7b_f16.ckpt": "7e48af7ad29ff22c15dc75ece31a0eb14938905c9d23ddaccbf5e347921ddff7",
+    "flux_2_dev_f16.ckpt": "3be592416d535838ddc7da9f3df8c8bddc2166bce0b49ff52275aad76f31012f",
+    "mistral_small_3.2_24b_instruct_2506_f16.ckpt": "1dc783a7b1b8c95b56c0d2ef8bfe5ed9b4b563ef1a51b9be7571cea75e5b1d17",
+    "qwen_image_1.0_bf16.ckpt": "484f627f7714499f41df816a8687dfce967a1e8692f38cba77eb0b412e8e8d31",
+    "qwen_image_1.0_f16.ckpt": "8f2089e48f56ee2c2fd173ae4cb9789c6cc1f999d58a6eab935a1a068dd48cc6",
+    "qwen_image_edit_2509_bf16.ckpt": "475623ec012704298e6ce4a64ee099835228cb7f342b824117b8a1c966c1e50b",
+    "qwen_2.5_vl_7b_vit_f16.ckpt": "e670fe5e19d02d3bce73bb655824855869ad135a21ba88170966f13700a60504",
+    "qwen_image_edit_2509_f16.ckpt": "5543d45c6060ef2e5b277feb15918219ac93e8c3dba120eec09133bff18838f0",
+    "flux_1_dev_q8p.ckpt": "2173dfe9e1a19f6d8ee11f9679cacea54ed63cfab4f9af7068b8ce86b7835dd0",
+    "t5_xxl_encoder_q6p.ckpt": "8f8fa0acc618df6f225122b3d03b6f60034490d9f9fd3b8799e7faa3e08943b7",
+    "flux_1_dev_q5p.ckpt": "d382a858a64a134415dc87fa793b28a42eb5dfa9cb552959f9e0916af9efc2e7",
+    "flux_1_dev_f16.ckpt": "b0887279918eda95aa1c44841404fd0fff9b78535262901aa4875b80e6197cc4",
+    "t5_xxl_encoder_f16.ckpt": "c526ebaf675e59bf0e7d736fd8ab1dd71096d14acb8d0e7c977d3109856814f6",
+    "chroma_1_hd_r0.1_q8p.ckpt": "b4313f59293088ba085c6a3dbfeea237d28faaced5dc39a3f73738ccb27f5242",
+    "chroma_1_hd_r0.1_q5p.ckpt": "ce0ab4a8b8e653c3d353dad8cb81c83885e0c86f81e326516b85cca35fda2111",
+    "flux_1_dev_de_distill_q8p.ckpt": "165638453c85bbb15384046d7416a00f5a77a70ad9e77c45a877c327a918a8e4",
+    "flux_1_dev_de_distill_q5p.ckpt": "32c0fb8607b88a85c0a861c866f78fb683c7d99a19d67f3d3b4c4c32cd17e369",
+    "qwen_image_edit_2511_q8p.ckpt": "efe1adbb4e6c24a2e6ca69ec0200c80a0490002b0e9dcb9faf1b7ca8e8b7e391",
+    "qwen_2.5_vl_7b_q8p.ckpt": "513b759b24619946d3ca13c0bf57464a32098593bbf8342001358fbfa51f78b1",
+    "wan_v2.2_a14b_hne_t2v_q8p.ckpt": "63b3dc2eaac38d1019017c4745ea763e9894b5aa55a97fb52dfe26985abc42e6",
+    "umt5_xxl_encoder_q8p.ckpt": "72ef62d22c09a3b764ac9e6fe0100f4029619fb3ff8ccec3432e509487b29831",
+    "wan_v2.1_video_vae_f16.ckpt": "4c518b128b3c1f2ea164aa46269d8875b4be3661d1fc0fba2709d03fa94e418b",
+    "wan_v2.2_a14b_lne_t2v_q8p.ckpt": "5fe77d9998141a667071353658d71acef656389210327391c832d39b4ee39671",
+    "wan_v2.2_a14b_hne_i2v_q8p.ckpt": "bf44ed82e723cf3f2469c9a89fd5a98296c924d489b883e7dadef4c122ad295d",
+    "wan_v2.2_a14b_lne_i2v_q8p.ckpt": "51486a592ba0190c333ba4e071aa9ed2b502c8aa5b79cb5d38325e399ac6c129",
+    "seedvr2_3b_q8p.ckpt": "cdde46771a8af490b97853c8fb255864a64d1528b40b1ebf2dee161db2b76fcd",
+    "seedvr2_vae_f16.ckpt": "af2a4a8eeae04372667ba4d6f6dd1337af0b3685d0e335dfc5abf71374a24234",
+    "seedvr2_7b_q8p.ckpt": "acb88f9c581d2668eead19742c4fcc8f7af515ff3abf9a4ffd7450e731bed9ce",
+    "krea_2_turbo_q8p.ckpt": "d5c0771a00fae06a749378b56318a361b8f3aeec42feb617c5486ac0d014dc23",
+    "qwen_3_vl_4b_q8p.ckpt": "be71703dbe695d2aee038539ac0a4dcba02a3ffdc4df4e5fe0b2c3f70a47c151",
+    "krea_2_turbo_q6p.ckpt": "fa610a2eb1753739d6855a3b84e55081ca2aa857fdd05f3fd70b7c635560ae5d",
+    "krea_2_turbo_i8x.ckpt": "e808501ada16a6dedc5b6d8b6426243d4b89d3be1ac9a02706e855684120e87f",
+    "krea_2_turbo_i6x.ckpt": "3802619d7861f05f04147a53b923c25605d0496041c9227c6edd85cb1cdc4c2e",
+    "ideogram_4_q8p.ckpt": "67cd736da092e5eae4f0906b27a7eab3a2b21749e677a3a175a4623e196a1c3e",
+    "qwen_3_vl_8b_instruct_q8p.ckpt": "54d29b3e951c233ae800604848b83422a48629857c70fb83c4620eb31d900b9a",
+    "ideogram_4_q6p.ckpt": "3f7a67d89da4751cde6c06f755d76eb84443a936b2901b27fd803e3607f9df64",
+    "ideogram_4_i8x.ckpt": "c82dd45d6fba7ad038e8f148760ed5cf65fe4e53c56b57b778fee26275e73503",
+    "ideogram_4_i6x.ckpt": "f0665f522abf955a9ea0512f79a52bd7f519eab8a0c72edfc94968eb8727ba30",
+    "ideogram_4_instant_q8p.ckpt": "0e65e2fe1b4691e99003f5d6e014ac42ebc53bef01de63aa1ff0090df40d76f9",
+    "ideogram_4_instant_q6p.ckpt": "33d8abb21719830dd63045f283c63d0a63ac8eb58b62eb86f3cf7576ff1fafc9",
+    "ideogram_4_instant_i8x.ckpt": "329339173898ccda81cd11c1b6c3db507c247ad8fa0d526e423bce2c223ea096",
+    "ideogram_4_instant_i6x.ckpt": "fe14da4a9accfad20ec935d877e22158a65768784a4902c6cce27725627fe987",
+    "ideogram_4_fast_q8p.ckpt": "51098994518657c4d8d630c9dada9f049f01145c5c6097582c897b96cf8936c0",
+    "ideogram_4_fast_q6p.ckpt": "cd805596c0886477ebe4671a8577d19cc64bc95d694515c1e1ba0b0c7ef1f5f1",
+    "ideogram_4_fast_i8x.ckpt": "62909317e2b4197b96838d5359bc4103b1674204474612838663d1a51b059f8d",
+    "ideogram_4_fast_i6x.ckpt": "33fb61d4fa6e92e9110ee7f1389ace0b39e4b6fc5cfa1b3156e007a927a22f74"
   }
 }

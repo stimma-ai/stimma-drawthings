@@ -39,7 +39,8 @@
       "speed_up_with_guidance_embed": true,
       "t5_text_encoder": true,
       "negative_prompt": ""
-    }
+    },
+    "max_images": 10
   },
   "krea-2": {
     "display_name": "Krea 2 Turbo",
@@ -142,6 +143,202 @@
     "vendor": "lightricks",
     "model_slug": "ltx-2.3",
     "kind": "video",
+    "supports_image": false,
+    "defaults": {
+      "width": 1280,
+      "height": 768,
+      "steps": 30,
+      "guidance": 5.0,
+      "sampler": "UniPC Trailing",
+      "shift": 5.0,
+      "frames": 121,
+      "fps": 24,
+      "mask_blur": 1.5,
+      "hires_fix": true,
+      "hires_fix_start_width": 640,
+      "hires_fix_start_height": 384,
+      "hires_fix_strength": 0.7,
+      "negative_prompt": "worst quality, inconsistent motion, blurry, jittery, distorted"
+    },
+    "audio": true
+  },
+  "ltx-2.3-distilled": {
+    "display_name": "LTX-2.3 Distilled",
+    "vendor": "lightricks",
+    "model_slug": "ltx-2.3-fast",
+    "kind": "video",
+    "supports_image": false,
+    "defaults": {
+      "width": 1280,
+      "height": 768,
+      "steps": 8,
+      "guidance": 1.0,
+      "sampler": "TCD Trailing",
+      "shift": 5.0,
+      "frames": 121,
+      "fps": 24,
+      "mask_blur": 1.5,
+      "hires_fix": true,
+      "hires_fix_start_width": 640,
+      "hires_fix_start_height": 384,
+      "hires_fix_strength": 0.7,
+      "negative_prompt": ""
+    },
+    "audio": true
+  },
+  "flux1-dev": {
+    "display_name": "FLUX.1 Dev",
+    "kind": "image",
+    "version": "flux1",
+    "prefix": "flux_1_dev_",
+    "supports_image": false,
+    "requires_image": false,
+    "max_images": 1,
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 20,
+      "guidance": 3.5,
+      "sampler": "UniPC Trailing",
+      "shift": 3.0,
+      "negative_prompt": "",
+      "speed_up_with_guidance_embed": true
+    },
+    "guidance_mode": "embedded"
+  },
+  "flux2-dev": {
+    "display_name": "FLUX.2 Dev",
+    "kind": "image",
+    "version": "flux2",
+    "prefix": "flux_2_dev_",
+    "supports_image": true,
+    "requires_image": false,
+    "max_images": 10,
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 20,
+      "guidance": 4,
+      "sampler": "UniPC Trailing",
+      "shift": 3.0,
+      "negative_prompt": "",
+      "speed_up_with_guidance_embed": true
+    },
+    "guidance_mode": "embedded"
+  },
+  "chroma-hd": {
+    "display_name": "Chroma HD",
+    "kind": "image",
+    "version": "flux1",
+    "prefix": "chroma_1_hd_r0.1_",
+    "supports_image": false,
+    "requires_image": false,
+    "max_images": 1,
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 30,
+      "guidance": 4,
+      "sampler": "UniPC Trailing",
+      "shift": 3.0,
+      "negative_prompt": ""
+    }
+  },
+  "anima": {
+    "display_name": "Anima Base 1.0",
+    "kind": "image",
+    "version": "cosmos2.5_2b",
+    "prefix": "anima_base_1.0_",
+    "supports_image": false,
+    "requires_image": false,
+    "max_images": 1,
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 30,
+      "guidance": 4,
+      "sampler": "UniPC Trailing",
+      "shift": 3.0,
+      "negative_prompt": ""
+    }
+  },
+  "qwen-image": {
+    "display_name": "Qwen Image",
+    "kind": "image",
+    "version": "qwen_image",
+    "prefix": "qwen_image_1.0_",
+    "supports_image": false,
+    "requires_image": false,
+    "max_images": 1,
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 20,
+      "guidance": 4,
+      "sampler": "UniPC Trailing",
+      "shift": 3.0,
+      "negative_prompt": ""
+    }
+  },
+  "qwen-image-2512": {
+    "display_name": "Qwen Image 2512",
+    "kind": "image",
+    "version": "qwen_image",
+    "prefix": "qwen_image_2512_",
+    "supports_image": false,
+    "requires_image": false,
+    "max_images": 1,
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 20,
+      "guidance": 4,
+      "sampler": "UniPC Trailing",
+      "shift": 3.0,
+      "negative_prompt": ""
+    }
+  },
+  "qwen-edit-2509": {
+    "display_name": "Qwen Image Edit 2509",
+    "kind": "image",
+    "version": "qwen_image",
+    "prefix": "qwen_image_edit_2509_",
+    "supports_image": true,
+    "requires_image": true,
+    "max_images": 3,
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 20,
+      "guidance": 4,
+      "sampler": "UniPC Trailing",
+      "shift": 3.0,
+      "negative_prompt": ""
+    }
+  },
+  "qwen-edit-2511": {
+    "display_name": "Qwen Image Edit 2511",
+    "kind": "image",
+    "version": "qwen_image",
+    "prefix": "qwen_image_edit_2511_",
+    "supports_image": true,
+    "requires_image": true,
+    "max_images": 3,
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 40,
+      "guidance": 4,
+      "sampler": "UniPC Trailing",
+      "shift": 3.0,
+      "negative_prompt": ""
+    }
+  },
+  "ltx-2.3-i2v": {
+    "display_name": "LTX-2.3 Image to Video",
+    "vendor": "lightricks",
+    "model_slug": "ltx-2.3",
+    "kind": "video",
     "supports_image": true,
     "defaults": {
       "width": 1280,
@@ -158,10 +355,13 @@
       "hires_fix_start_height": 384,
       "hires_fix_strength": 0.7,
       "negative_prompt": "worst quality, inconsistent motion, blurry, jittery, distorted"
-    }
+    },
+    "audio": true,
+    "requires_image": true,
+    "source_profile": "ltx-2.3"
   },
-  "ltx-2.3-distilled": {
-    "display_name": "LTX-2.3 Distilled",
+  "ltx-2.3-distilled-i2v": {
+    "display_name": "LTX-2.3 Distilled Image to Video",
     "vendor": "lightricks",
     "model_slug": "ltx-2.3-fast",
     "kind": "video",
@@ -180,6 +380,105 @@
       "hires_fix_start_width": 640,
       "hires_fix_start_height": 384,
       "hires_fix_strength": 0.7,
+      "negative_prompt": ""
+    },
+    "audio": true,
+    "requires_image": true,
+    "source_profile": "ltx-2.3-distilled"
+  },
+  "wan22-t2v": {
+    "display_name": "Wan 2.2 T2V",
+    "version": "wan_v2.1_14b",
+    "prefix": "wan_v2.2_a14b_hne_t2v_",
+    "kind": "video",
+    "supports_image": false,
+    "requires_image": false,
+    "frame_quantum": 4,
+    "max_frames": 81,
+    "refiner": true,
+    "defaults": {
+      "width": 832,
+      "height": 448,
+      "steps": 20,
+      "guidance": 5,
+      "sampler": "UniPC Trailing",
+      "shift": 5,
+      "fps": 16,
+      "refiner_start": 0.5,
+      "negative_prompt": ""
+    },
+    "files": [
+      "wan_v2.2_a14b_hne_t2v_q8p.ckpt"
+    ]
+  },
+  "wan22-i2v": {
+    "display_name": "Wan 2.2 I2V",
+    "version": "wan_v2.1_14b",
+    "prefix": "wan_v2.2_a14b_hne_i2v_",
+    "kind": "video",
+    "supports_image": true,
+    "requires_image": true,
+    "frame_quantum": 4,
+    "max_frames": 81,
+    "refiner": true,
+    "defaults": {
+      "width": 832,
+      "height": 448,
+      "steps": 20,
+      "guidance": 5,
+      "sampler": "UniPC Trailing",
+      "shift": 5,
+      "fps": 16,
+      "refiner_start": 0.5,
+      "negative_prompt": ""
+    },
+    "files": [
+      "wan_v2.2_a14b_hne_i2v_q8p.ckpt"
+    ]
+  },
+  "seedvr2-3b": {
+    "display_name": "SeedVR2 3B Image Upscale",
+    "version": "seedvr2_3b",
+    "prefix": "seedvr2_3b_",
+    "files": [
+      "seedvr2_3b_q8p.ckpt"
+    ],
+    "kind": "image",
+    "supports_image": true,
+    "requires_image": true,
+    "restoration": true,
+    "defaults": {
+      "width": 1536,
+      "height": 1536,
+      "steps": 1,
+      "guidance": 1,
+      "sampler": "DDIM Trailing",
+      "shift": 1,
+      "num_frames": 1,
+      "color_calibration": "Lab",
+      "negative_prompt": ""
+    }
+  },
+  "seedvr2-7b": {
+    "display_name": "SeedVR2 7B Image Upscale",
+    "version": "seedvr2_7b",
+    "prefix": "seedvr2_7b_",
+    "files": [
+      "seedvr2_7b_q8p.ckpt"
+    ],
+    "kind": "image",
+    "supports_image": true,
+    "requires_image": true,
+    "restoration": true,
+    "defaults": {
+      "width": 1536,
+      "height": 1536,
+      "steps": 1,
+      "guidance": 1,
+      "sampler": "DDIM Trailing",
+      "shift": 1,
+      "num_frames": 1,
+      "color_calibration": "Lab",
       "negative_prompt": ""
     }
   }
