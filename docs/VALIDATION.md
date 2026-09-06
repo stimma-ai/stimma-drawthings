@@ -36,10 +36,14 @@ Elapsed times are not performance guarantees and exclude queue time.
 | Krea 2 Turbo | Text-to-image with installed quantized checkpoint |
 | Ideogram 4 | Base, Fast, and Instant text-to-image |
 | Native LoRA | SDXL Offset selected with an explicit weight |
-| LoRA upload | Official SDXL safetensors uploaded over STP/HTTP, converted, transferred, then used in generation |
+| LoRA upload | Official SDXL safetensors uploaded over STP/HTTP, converted, transferred, then used in generation; converter also auto-downloaded from the public runtime release |
 | ControlNet | SDXL Canny Mid, paired control image, generated PNG |
 | Native upscaling | Real-ESRGAN X2+, downloaded on first use; 512x512 input to 1024x1024 output |
 | LTX-2.3 Distilled | Short video: 9 frames, 512x512, H.264, stereo 48 kHz AAC, 1.125 seconds |
+| LTX default preset | 1280x768, 121 frames, 24 fps, 5.041667 seconds, stereo 48 kHz AAC; automatic encoder download |
+| LTX-2.3 image-to-video | 512x512 source image, 9 output frames, native audio |
+| Running cancellation | Cancel during sampling, one CANCELLED result, then successful Z-Image generation |
+| Live previews | Five inline PNG previews received during the cancellation/recovery sequence |
 | Process ownership | Owned engine exits with stdio provider; persistent WebSocket provider keeps its engine loaded |
 
 The engine downloads model components into temporary staging and transfers them

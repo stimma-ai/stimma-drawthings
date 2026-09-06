@@ -16,7 +16,12 @@ pub struct Engine {
 
 impl Engine {
     pub async fn connect(&self) -> Result<Client> {
-        let channel = Endpoint::from_shared(self.endpoint.clone())?
+        let mut endpoint = Endpoint::from_shared(self.endpoint.clone())?;
+        if self.endpoint.starts_with("https://") {
+            endpoint = endpoint
+                .tls_config(tonic::transport::ClientTlsConfig::new().with_native_roots())?;
+        }
+        let channel = endpoint
             .connect_timeout(Duration::from_secs(3))
             .connect()
             .await?;

@@ -145,9 +145,13 @@ pub async fn catalog(runtime: &Runtime, refresh: bool) -> Result<MetadataOverrid
 pub fn registry_path(runtime: &Runtime) -> std::path::PathBuf {
     use sha2::{Digest, Sha256};
     let identity = if runtime.managed {
-        "managed-local-model-store"
+        runtime
+            .models
+            .as_ref()
+            .map(|p| p.to_string_lossy().into_owned())
+            .unwrap_or_else(|| "managed-local-model-store".into())
     } else {
-        &runtime.engine.endpoint
+        runtime.engine.endpoint.clone()
     };
     runtime.state.join(format!(
         "loras-{}.json",

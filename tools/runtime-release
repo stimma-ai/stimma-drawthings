@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")/.."
+binary="${1:?usage: tools/drawthings runtime-release BINARY SOURCE_BUNDLE}"
+source="${2:?source bundle required}"
+test "$(shasum -a 256 "$binary" | cut -d ' ' -f 1)" = '63e3086a8d72635b46a1f1b5f918b254a6bab7d48222c1d0f3418d5d20be74d4'
+test "$(gh api user --jq .login)" = stimmant
+gh release create runtime-v1 --repo stimma-ai/stimma-drawthings --target main \
+  "$binary" "$source" --title 'Optional LoRA converter runtime' \
+  --notes-file vendor/lora-converter/README.md --latest=false
