@@ -6,7 +6,7 @@ use std::{
     time::Duration,
 };
 use stimma_drawthings::{
-    engine,
+    catalog as tools_catalog, generation,
     proto::{
         self,
         image_generation_service_server::{ImageGenerationService, ImageGenerationServiceServer},
@@ -45,7 +45,12 @@ impl ImageGenerationService for Mock {
         &self,
         r: Request<proto::ImageGenerationRequest>,
     ) -> Result<Response<Self::GenerateImageStream>, Status> {
-        self.requests.lock().unwrap().push(r.into_inner());
+        let request = r.into_inner();
+        let slow = request.prompt == "slow";
+        self.requests.lock().unwrap().push(request);
+        if slow {
+            tokio::time::sleep(Duration::from_millis(750)).await;
+        }
         let mut words = [0u32; 17];
         words[1] = 1;
         words[2] = 2;
@@ -70,9 +75,14 @@ impl ImageGenerationService for Mock {
     }
     async fn files_exist(
         &self,
-        _: Request<proto::FileListRequest>,
+        r: Request<proto::FileListRequest>,
     ) -> Result<Response<proto::FileExistenceResponse>, Status> {
-        Err(Status::unimplemented("fixture"))
+        let files = r.into_inner().files;
+        Ok(Response::new(proto::FileExistenceResponse {
+            existences: vec![true; files.len()],
+            files,
+            hashes: vec![],
+        }))
     }
     async fn upload_file(
         &self,
@@ -96,13 +106,14 @@ impl ImageGenerationService for Mock {
 
 #[test]
 fn configuration_validation_and_wire_units() {
-    let request = engine::generation(
+    let (profile, _, params) = tools_catalog::prepare(
         "z-image-turbo",
         &json!({"prompt":"green","width":512,"height":768,"seed":7}),
         &catalog(),
     )
     .unwrap();
-    let config=stimma_drawthings::generated::stimma_drawthings::_generated::config::root_as_generation_configuration(&request.configuration).unwrap();
+    let (wire, _) = generation::configuration(&profile, &params, false).unwrap();
+    let config=stimma_drawthings::generated::stimma_drawthings::_generated::config::root_as_generation_configuration(&wire).unwrap();
     assert_eq!(
         (
             config.start_width(),
@@ -118,7 +129,7 @@ fn configuration_validation_and_wire_units() {
         json!({"prompt":"x","typo":1}),
         json!({"prompt":"x","checkpoint":"other.ckpt"}),
     ] {
-        assert!(engine::generation("z-image-turbo", &params, &catalog()).is_err());
+        assert!(tools_catalog::prepare("z-image-turbo", &params, &catalog()).is_err());
     }
 }
 
@@ -135,8 +146,9 @@ async fn real_stp_cli_discovers_and_generates_png() {
     );
     let dir = tempfile::tempdir().unwrap();
     let provider = format!(
-        "'{}' --endpoint http://127.0.0.1:{port}",
-        env!("CARGO_BIN_EXE_stimma-drawthings")
+        "'{}' --offline --state-path '{}' --endpoint http://127.0.0.1:{port}",
+        env!("CARGO_BIN_EXE_stimma-drawthings"),
+        dir.path().display()
     );
     let output = tokio::time::timeout(
         Duration::from_secs(20),
@@ -189,5 +201,191 @@ async fn real_stp_cli_discovers_and_generates_png() {
     let response: Value = serde_json::from_slice(&output.stdout).unwrap();
     assert!(response.to_string().contains("actual_seed"));
     assert_eq!(requests.lock().unwrap()[0].prompt, "green square");
+    server.abort();
+}
+
+#[tokio::test]
+async fn websocket_stp_and_authenticated_asset_transfer() {
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let port = listener.local_addr().unwrap().port();
+    let server = tokio::spawn(
+        tonic::transport::Server::builder()
+            .add_service(ImageGenerationServiceServer::new(Mock::default()))
+            .serve_with_incoming(TcpListenerStream::new(listener)),
+    );
+    let reserve = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let web = reserve.local_addr().unwrap();
+    drop(reserve);
+    let dir = tempfile::tempdir().unwrap();
+    let mut provider = tokio::process::Command::new(env!("CARGO_BIN_EXE_stimma-drawthings"))
+        .args([
+            "--websocket",
+            "--offline",
+            "--bind",
+            &web.to_string(),
+            "--endpoint",
+            &format!("http://127.0.0.1:{port}"),
+            "--state-path",
+        ])
+        .arg(dir.path())
+        .env("STIMMA_DRAWTHINGS_TOKEN", "test-token")
+        .kill_on_drop(true)
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    for _ in 0..100 {
+        if tokio::net::TcpStream::connect(web).await.is_ok() {
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(50)).await;
+    }
+    let client = reqwest::Client::new();
+    let asset = format!("http://{web}/assets/fixture.png");
+    assert_eq!(
+        client
+            .put(&asset)
+            .body("fixture")
+            .send()
+            .await
+            .unwrap()
+            .status(),
+        401
+    );
+    assert!(client
+        .put(&asset)
+        .bearer_auth("test-token")
+        .body("fixture")
+        .send()
+        .await
+        .unwrap()
+        .status()
+        .is_success());
+    assert_eq!(
+        client
+            .get(&asset)
+            .bearer_auth("test-token")
+            .send()
+            .await
+            .unwrap()
+            .text()
+            .await
+            .unwrap(),
+        "fixture"
+    );
+    let output = tokio::time::timeout(
+        Duration::from_secs(20),
+        tokio::process::Command::new("stp")
+            .args([
+                "--url",
+                &format!("ws://{web}/stp-v1"),
+                "--token",
+                "test-token",
+                "run",
+                "z-image-turbo",
+                "green",
+                "-o",
+            ])
+            .arg(dir.path().join("output.png"))
+            .output(),
+    )
+    .await
+    .unwrap()
+    .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert_eq!(
+        image::open(dir.path().join("output.png"))
+            .unwrap()
+            .to_rgb8()
+            .get_pixel(0, 0)
+            .0,
+        [0, 255, 0]
+    );
+    provider.kill().await.unwrap();
+    provider.wait().await.unwrap();
+    server.abort();
+}
+
+#[tokio::test]
+async fn queued_job_cancellation_has_one_terminal_and_next_job_runs() {
+    use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let port = listener.local_addr().unwrap().port();
+    let mock = Mock::default();
+    let requests = mock.requests.clone();
+    let server = tokio::spawn(
+        tonic::transport::Server::builder()
+            .add_service(ImageGenerationServiceServer::new(mock))
+            .serve_with_incoming(TcpListenerStream::new(listener)),
+    );
+    let dir = tempfile::tempdir().unwrap();
+    let mut child = tokio::process::Command::new(env!("CARGO_BIN_EXE_stimma-drawthings"))
+        .args([
+            "--offline",
+            "--endpoint",
+            &format!("http://127.0.0.1:{port}"),
+            "--state-path",
+        ])
+        .arg(dir.path())
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .kill_on_drop(true)
+        .spawn()
+        .unwrap();
+    let mut input = child.stdin.take().unwrap();
+    let mut lines = BufReader::new(child.stdout.take().unwrap()).lines();
+    let register = lines.next_line().await.unwrap().unwrap();
+    assert!(register.contains("provider.register"));
+    for (id, prompt) in [("first", "slow"), ("cancel", "unused"), ("last", "green")] {
+        let message = json!({"jsonrpc":"2.0","id":id,"method":"tools.execute","params":{"request_id":id,"tool_id":"z-image-turbo","parameters":{"prompt":prompt}}});
+        input
+            .write_all(format!("{message}\n").as_bytes())
+            .await
+            .unwrap();
+    }
+    input.write_all(b"{\"jsonrpc\":\"2.0\",\"id\":\"c\",\"method\":\"tools.cancel\",\"params\":{\"request_id\":\"cancel\"}}\n").await.unwrap();
+    input.flush().await.unwrap();
+    let outcomes = tokio::time::timeout(Duration::from_secs(10), async {
+        let mut terminal = Vec::new();
+        let mut accepted = 0;
+        while terminal.len() < 3 {
+            let value: Value =
+                serde_json::from_str(&lines.next_line().await.unwrap().unwrap()).unwrap();
+            if value["result"]["accepted"] == true {
+                accepted += 1;
+            }
+            if value["method"] == "tools.result" {
+                terminal.push(value["params"].clone());
+            }
+        }
+        assert_eq!(accepted, 3);
+        terminal
+    })
+    .await
+    .unwrap();
+    assert_eq!(
+        outcomes
+            .iter()
+            .filter(|v| v["request_id"] == "cancel")
+            .count(),
+        1
+    );
+    assert!(outcomes
+        .iter()
+        .any(|v| v["request_id"] == "cancel" && v["error"]["code"] == "CANCELLED"));
+    assert!(outcomes
+        .iter()
+        .any(|v| v["request_id"] == "last" && v["success"] == true));
+    assert_eq!(requests.lock().unwrap().len(), 2);
+    drop(input);
+    tokio::time::timeout(Duration::from_secs(3), child.wait())
+        .await
+        .unwrap()
+        .unwrap();
     server.abort();
 }

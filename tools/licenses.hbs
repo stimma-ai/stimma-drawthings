@@ -1,0 +1,14 @@
+# Dependency licenses
+
+Generated from Cargo.lock with cargo-about. Includes the license texts for
+compiled dependencies. Runtime components are listed in THIRD_PARTY_NOTICES.md.
+
+{{#each licenses}}
+## {{name}}
+Used by: {{#each used_by}}{{crate.name}} {{crate.version}}{{#unless @last}}, {{/unless}}{{/each}}
+
+```text
+{{{text}}}
+```
+
+{{/each}}

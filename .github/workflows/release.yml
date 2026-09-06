@@ -1,0 +1,41 @@
+name: Release
+on:
+  push:
+    tags: ['v[0-9]*']
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-14, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Install STP host
+        run: cargo install --git https://github.com/stimma-ai/stimma-tools-protocol-cli --rev 39d705ed7ba619aef1d7c9bbeeb2a2bf754f3dea --locked stp
+      - run: tools/drawthings test --locked
+      - run: tools/drawthings build --locked
+      - run: tools/drawthings package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: provider-${{ matrix.os }}
+          path: .validation/dist/*
+          include-hidden-files: true
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --title "$GITHUB_REF_NAME" --notes-file docs/RELEASE_NOTES.md --latest

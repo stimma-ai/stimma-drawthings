@@ -1,0 +1,186 @@
+{
+  "z-image-turbo": {
+    "display_name": "Z-Image Turbo",
+    "vendor": "alibaba",
+    "model_slug": "z-image-turbo",
+    "kind": "image",
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 8,
+      "guidance": 1.0,
+      "sampler": "UniPC Trailing",
+      "shift": 3.0,
+      "clip_skip": 1,
+      "mask_blur": 1.5,
+      "tea_cache_threshold": 0.2,
+      "resolution_dependent_shift": false,
+      "negative_prompt": " "
+    }
+  },
+  "flux2-klein-9b": {
+    "display_name": "FLUX.2 Klein 9B",
+    "vendor": "black-forest-labs",
+    "model_slug": "flux2-klein-9b",
+    "kind": "image",
+    "supports_image": true,
+    "supports_inpaint": true,
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 4,
+      "guidance": 1.0,
+      "sampler": "DDIM Trailing",
+      "shift": 3.0,
+      "clip_skip": 2,
+      "mask_blur": 2.5,
+      "tea_cache_threshold": 0.3,
+      "resolution_dependent_shift": false,
+      "speed_up_with_guidance_embed": true,
+      "t5_text_encoder": true,
+      "negative_prompt": ""
+    }
+  },
+  "krea-2": {
+    "display_name": "Krea 2 Turbo",
+    "vendor": "krea",
+    "model_slug": "krea-2",
+    "kind": "image",
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 8,
+      "guidance": 1.0,
+      "sampler": "UniPC AYS",
+      "shift": 1.0,
+      "clip_skip": 1,
+      "tea_cache_threshold": 0.2,
+      "resolution_dependent_shift": true,
+      "negative_prompt": ""
+    }
+  },
+  "ideogram-4": {
+    "display_name": "Ideogram 4",
+    "vendor": "ideogram",
+    "model_slug": "ideogram-4",
+    "kind": "image",
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 48,
+      "guidance": 7.0,
+      "sampler": "UniPC AYS",
+      "shift": 1.0,
+      "clip_skip": 1,
+      "tea_cache_threshold": 0.2,
+      "resolution_dependent_shift": true,
+      "negative_prompt": ""
+    }
+  },
+  "ideogram-4-instant": {
+    "display_name": "Ideogram 4 Instant",
+    "vendor": "ideogram",
+    "model_slug": "ideogram-4-instant",
+    "kind": "image",
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 8,
+      "guidance": 1.0,
+      "sampler": "UniPC AYS",
+      "shift": 1.0,
+      "clip_skip": 1,
+      "tea_cache_threshold": 0.2,
+      "resolution_dependent_shift": true,
+      "negative_prompt": ""
+    }
+  },
+  "ideogram-4-fast": {
+    "display_name": "Ideogram 4 Fast",
+    "vendor": "ideogram",
+    "model_slug": "ideogram-4-fast",
+    "kind": "image",
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 20,
+      "guidance": 1.0,
+      "sampler": "UniPC AYS",
+      "shift": 1.0,
+      "clip_skip": 1,
+      "tea_cache_threshold": 0.2,
+      "resolution_dependent_shift": true,
+      "negative_prompt": ""
+    }
+  },
+  "sdxl": {
+    "display_name": "SDXL",
+    "vendor": "stability-ai",
+    "model_slug": "sdxl",
+    "kind": "image",
+    "supports_image": true,
+    "supports_inpaint": true,
+    "defaults": {
+      "width": 1024,
+      "height": 1024,
+      "steps": 16,
+      "guidance": 5.0,
+      "sampler": "DPM++ 2M AYS",
+      "shift": 1.0,
+      "clip_skip": 2,
+      "mask_blur": 2.5,
+      "aesthetic_score": 6.0,
+      "negative_aesthetic_score": 2.5,
+      "negative_original_image_width": 512,
+      "negative_original_image_height": 512,
+      "zero_negative_prompt": true,
+      "negative_prompt": ""
+    }
+  },
+  "ltx-2.3": {
+    "display_name": "LTX-2.3",
+    "vendor": "lightricks",
+    "model_slug": "ltx-2.3",
+    "kind": "video",
+    "supports_image": true,
+    "defaults": {
+      "width": 1280,
+      "height": 768,
+      "steps": 30,
+      "guidance": 5.0,
+      "sampler": "UniPC Trailing",
+      "shift": 5.0,
+      "frames": 121,
+      "fps": 24,
+      "mask_blur": 1.5,
+      "hires_fix": true,
+      "hires_fix_start_width": 640,
+      "hires_fix_start_height": 384,
+      "hires_fix_strength": 0.7,
+      "negative_prompt": "worst quality, inconsistent motion, blurry, jittery, distorted"
+    }
+  },
+  "ltx-2.3-distilled": {
+    "display_name": "LTX-2.3 Distilled",
+    "vendor": "lightricks",
+    "model_slug": "ltx-2.3-fast",
+    "kind": "video",
+    "supports_image": true,
+    "defaults": {
+      "width": 1280,
+      "height": 768,
+      "steps": 8,
+      "guidance": 1.0,
+      "sampler": "TCD Trailing",
+      "shift": 5.0,
+      "frames": 121,
+      "fps": 24,
+      "mask_blur": 1.5,
+      "hires_fix": true,
+      "hires_fix_start_width": 640,
+      "hires_fix_start_height": 384,
+      "hires_fix_strength": 0.7,
+      "negative_prompt": ""
+    }
+  }
+}

@@ -1,0 +1,47 @@
+diff --git a/Libraries/DataModels/Sources/DeviceCapability.swift b/Libraries/DataModels/Sources/DeviceCapability.swift
+index eebf416..e1f127f 100644
+--- a/Libraries/DataModels/Sources/DeviceCapability.swift
++++ b/Libraries/DataModels/Sources/DeviceCapability.swift
+@@ -107,7 +107,9 @@ public struct DeviceCapability {
+         guard physicalMemory >= 50_465_865_728 else {
+           return false
+         }
+-        if let device = MTLCreateSystemDefaultDevice(), device.supportsFamily(.apple10) {
++        if let device = MTLCreateSystemDefaultDevice(),
++          device.supportsFamily(MTLGPUFamily(rawValue: 1010)!)
++        {
+           return true
+         }
+       }
+@@ -136,7 +138,9 @@ public struct DeviceCapability {
+       return false
+     #else
+       if #available(iOS 26.2, macOS 26.2, macCatalyst 26.2, *) {
+-        if let device = MTLCreateSystemDefaultDevice(), device.supportsFamily(.apple10) {
++        if let device = MTLCreateSystemDefaultDevice(),
++          device.supportsFamily(MTLGPUFamily(rawValue: 1010)!)
++        {
+           return true
+         }
+         return false
+@@ -189,7 +193,8 @@ public struct DeviceCapability {
+     #else
+       if #available(iOS 26, macOS 26, macCatalyst 26, *) {
+         if let device = MTLCreateSystemDefaultDevice(),
+-          device.supportsFamily(.apple9) && !device.supportsFamily(.apple10)
++          device.supportsFamily(.apple9)
++            && !device.supportsFamily(MTLGPUFamily(rawValue: 1010)!)
+         {
+           return true
+         }
+@@ -287,7 +292,9 @@ public struct DeviceCapability {
+         guard physicalMemory >= 50_465_865_728 else {
+           return true
+         }
+-        if let device = MTLCreateSystemDefaultDevice(), device.supportsFamily(.apple10) {
++        if let device = MTLCreateSystemDefaultDevice(),
++          device.supportsFamily(MTLGPUFamily(rawValue: 1010)!)
++        {
+           return false
+         }
+       }

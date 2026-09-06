@@ -1,0 +1,21 @@
+name: Check
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [macos-14, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Install STP host
+        run: cargo install --git https://github.com/stimma-ai/stimma-tools-protocol-cli --rev 39d705ed7ba619aef1d7c9bbeeb2a2bf754f3dea --locked stp
+      - run: tools/drawthings test --locked
+      - run: tools/drawthings lint
+      - run: tools/drawthings build --locked

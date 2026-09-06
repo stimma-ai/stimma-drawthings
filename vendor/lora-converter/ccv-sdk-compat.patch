@@ -1,0 +1,17 @@
+diff --git a/lib/nnc/mfa/ccv_nnc_mfa_ane_rowwise_coreml.mm b/lib/nnc/mfa/ccv_nnc_mfa_ane_rowwise_coreml.mm
+index 74762eb..f9d8341 100644
+--- a/lib/nnc/mfa/ccv_nnc_mfa_ane_rowwise_coreml.mm
++++ b/lib/nnc/mfa/ccv_nnc_mfa_ane_rowwise_coreml.mm
+@@ -13,6 +13,13 @@
+ #import <Metal/Metal.h>
+ #import <objc/message.h>
+ 
++// CoreML added the public Int8 enum after the macOS 15 SDK. The converter
++// never executes this ANE path, but ccv still compiles it into the NNC target.
++#if __MAC_OS_X_VERSION_MAX_ALLOWED < 260000
++#define MLMultiArrayDataTypeInt8 static_cast<MLMultiArrayDataType>(0x20008)
++#endif
++
+ #include <algorithm>
+ #include <atomic>
+ #include <cmath>

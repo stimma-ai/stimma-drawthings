@@ -2,16 +2,21 @@
 set -eu
 cd "$(dirname "$0")/.."
 case "${1:-help}" in
-  build) shift; cargo build --release "$@" ;;
+  build) shift
+    export RUSTFLAGS="${RUSTFLAGS:-} --remap-path-prefix=$HOME=/build --remap-path-prefix=$(pwd)=/src/stimma-drawthings"
+    cargo build --release "$@" ;;
+  package) shift; exec tools/package "$@" ;;
+  release) exec tools/release ;;
+  licenses) cargo about generate tools/licenses.hbs -o THIRD_PARTY_LICENSES.md ;;
   test) shift; cargo test "$@" ;;
   lint) cargo fmt --check; cargo clippy --all-targets -- -D warnings ;;
   run) shift; cargo run --quiet -- "$@" ;;
   generate)
-    "${FLATC:-flatc}" --rust --gen-object-api -o src/generated schemas/config.fbs
+    "${FLATC:-flatc}" --rust --gen-object-api --rust-serialize -o src/generated schemas/config.fbs
     # Normalize generator-produced trailing blank lines without changing bindings.
     awk 'NF {last=NR} {lines[NR]=$0} END {for(i=1;i<=last;i++) print lines[i]}' \
       src/generated/config_generated.rs > src/generated/config_generated.rs.tmp
     mv src/generated/config_generated.rs.tmp src/generated/config_generated.rs
     ;;
-  *) echo 'Usage: tools/drawthings {build|test|lint|generate|run [provider options]}' ;;
+  *) echo 'Usage: tools/drawthings {build|test|lint|generate|licenses|package|release|run [provider options]}' ;;
 esac

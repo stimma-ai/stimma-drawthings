@@ -1,5 +1,12 @@
+pub mod catalog;
 pub mod engine;
+pub mod generation;
+pub mod install;
+pub mod media;
+pub mod provider;
+pub mod store;
 pub mod tensor;
+pub mod transport;
 
 pub mod proto {
     include!(concat!(env!("OUT_DIR"), "/_.rs"));
@@ -7,5 +14,5 @@ pub mod proto {
 
 #[allow(warnings, clippy::all)]
 pub mod generated {
-    include!("generated/config_generated.rs");
+    include!(concat!(env!("OUT_DIR"), "/config_generated.rs"));
 }
