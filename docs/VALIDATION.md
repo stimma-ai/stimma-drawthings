@@ -44,6 +44,7 @@ Elapsed times are not performance guarantees and exclude queue time.
 | LTX-2.3 image-to-video | 512x512 source image, 9 output frames, native audio |
 | Running cancellation | Cancel during sampling, one CANCELLED result, then successful Z-Image generation |
 | Live previews | Five inline PNG previews received during the cancellation/recovery sequence |
+| Packaged executable | Unpacked release archive generated through real STP in attach and offline managed modes |
 | Process ownership | Owned engine exits with stdio provider; persistent WebSocket provider keeps its engine loaded |
 
 The engine downloads model components into temporary staging and transfers them
