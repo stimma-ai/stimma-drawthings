@@ -28,6 +28,8 @@ In Stimma's tool provider settings, add a WebSocket provider with this URL:
 ws://127.0.0.1:8765/stp-v1
 ```
 
+To accept connections from other machines, add `--bind 0.0.0.0:8765` and use this machine's IP address in the connection URL. Authentication is optional: set `STIMMA_DRAWTHINGS_TOKEN` if you want clients to supply a bearer token.
+
 Leave the adapter running while you use it. It starts the generation engine when needed and keeps it loaded between requests. The first generation may take longer while models download.
 
 If your Draw Things models live in a custom folder, start it with:

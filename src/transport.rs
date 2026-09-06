@@ -174,11 +174,8 @@ pub async fn serve(
     bind: std::net::SocketAddr,
     token: Option<String>,
 ) -> Result<()> {
-    anyhow::ensure!(
-        bind.ip().is_loopback() || token.as_ref().is_some_and(|t| !t.is_empty()),
-        "Non-loopback WebSocket servers require STIMMA_DRAWTHINGS_TOKEN"
-    );
     tokio::fs::create_dir_all(&assets).await?;
+    let token = token.filter(|value| !value.is_empty());
     let state = Web { app, assets, token };
     let router = Router::new()
         .route("/stp-v1", get(websocket))

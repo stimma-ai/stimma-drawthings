@@ -389,3 +389,61 @@ async fn queued_job_cancellation_has_one_terminal_and_next_job_runs() {
         .unwrap();
     server.abort();
 }
+
+#[tokio::test]
+async fn network_listener_works_without_auth_configuration() {
+    let reserve = std::net::TcpListener::bind("0.0.0.0:0").unwrap();
+    let port = reserve.local_addr().unwrap().port();
+    drop(reserve);
+    let dir = tempfile::tempdir().unwrap();
+    let mut provider = tokio::process::Command::new(env!("CARGO_BIN_EXE_stimma-drawthings"))
+        .args([
+            "--websocket",
+            "--offline",
+            "--bind",
+            &format!("0.0.0.0:{port}"),
+            "--state-path",
+        ])
+        .arg(dir.path())
+        .env_remove("STIMMA_DRAWTHINGS_TOKEN")
+        .kill_on_drop(true)
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    for _ in 0..100 {
+        if tokio::net::TcpStream::connect(("127.0.0.1", port))
+            .await
+            .is_ok()
+        {
+            break;
+        }
+        assert!(
+            provider.try_wait().unwrap().is_none(),
+            "Unauthenticated network listener exited"
+        );
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    }
+    let result = tokio::time::timeout(
+        Duration::from_secs(20),
+        tokio::process::Command::new("stp")
+            .args([
+                "--url",
+                &format!("ws://127.0.0.1:{port}/stp-v1"),
+                "raw",
+                "tools.list",
+            ])
+            .output(),
+    )
+    .await
+    .unwrap()
+    .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    assert!(String::from_utf8_lossy(&result.stdout).contains("z-image-turbo"));
+    provider.kill().await.unwrap();
+    provider.wait().await.unwrap();
+}
