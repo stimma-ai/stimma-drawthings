@@ -1,0 +1,33 @@
+[package]
+name = "stimma-drawthings"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0-only"
+authors = ["Stimma <stimmant@stimma.ai>"]
+description = "Standalone Draw Things STP provider"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+flatbuffers = "=25.12.19"
+half = "2"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+prost = "0.14"
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "io-std", "io-util", "process", "time", "sync", "fs"] }
+tonic = { version = "0.14", features = ["tls-native-roots"] }
+tonic-prost = "0.14"
+uuid = { version = "1", features = ["v4"] }
+
+[build-dependencies]
+protoc-bin-vendored = "3"
+tonic-prost-build = "0.14"
+
+[dev-dependencies]
+tempfile = "3"
+tokio-stream = { version = "0.1", features = ["net"] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

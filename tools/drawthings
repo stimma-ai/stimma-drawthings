@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")/.."
+case "${1:-help}" in
+  build) shift; cargo build --release "$@" ;;
+  test) shift; cargo test "$@" ;;
+  lint) cargo fmt --check; cargo clippy --all-targets -- -D warnings ;;
+  run) shift; cargo run --quiet -- "$@" ;;
+  *) echo 'Usage: tools/drawthings {build|test|lint|run [provider options]}' ;;
+esac
