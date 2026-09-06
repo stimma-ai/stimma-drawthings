@@ -73,3 +73,5 @@ available only for recognized image latent layouts.
 ## Embedded manager
 
 Verified real managed-engine start and stop through the browser, model search, connection details, and light/dark layouts at narrow widths. HTTP integration checks cover token-free network access, relative embedded assets, catalog counts, rejected unknown checkpoints, and operation completion. The manager shares the generation semaphore so setup and generation cannot run concurrently.
+
+The revised manager was checked with a live Z-Image generation on Apple M4 Max: GPU utilization reached 99%, GPU allocations reached 8.3 GiB, and engine resident memory was reported. Native metrics are system-wide, sampled from `ioreg`, `vm_stat`, `sysctl`, and `ps` without elevated privileges. GPU fields are best-effort and may be unavailable on other macOS versions; remote engines do not inherit the adapter machine’s metrics. Cancelling an engine startup was verified to stop startup and release generation capacity.

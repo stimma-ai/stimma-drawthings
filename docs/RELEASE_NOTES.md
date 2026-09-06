@@ -1,9 +1,7 @@
-Draw Things now has a built-in manager that opens from Stimma’s provider toolbar or a browser.
+A built-in Draw Things manager, available from Stimma’s provider toolbar or a browser.
 
-Start and stop the managed engine, browse checkpoints, download models ahead of time, cancel setup operations, and follow generation activity. The UI follows Stimma’s light and dark themes and ships inside the existing executable. No additional service or installation is needed.
+The overview shows engine controls and live Mac workload metrics: GPU utilization, unified memory, memory pressure, GPU allocations, compression, and swap.
 
-Token authentication is optional on both localhost and network listeners.
+Models has a downloaded library with checkpoint sizes and a separate browser for choosing model versions. Downloads show progress and cancellation beside the selected version. Activity tracks generations and setup operations.
 
-The existing 28 model-specific STP tools are unchanged.
-
-Uses the official PNG app artwork for compatibility with embedded browsers; the provider icon fits within STP’s size limit.
+The manager ships inside the existing executable, follows Stimma’s light and dark themes, and requires no additional installation. Authentication remains optional. The existing 28 model-specific STP tools are unchanged.

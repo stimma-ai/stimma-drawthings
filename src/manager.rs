@@ -18,6 +18,7 @@ use tokio::sync::{mpsc, Mutex};
 pub const PREFIX: &str = "/stp-v1/manage/";
 #[derive(Default)]
 pub struct Manager {
+    pub metrics: crate::metrics::Metrics,
     pub activity: Mutex<VecDeque<Value>>,
     pub operation: Mutex<Option<(String, tokio::task::AbortHandle)>>,
 }
@@ -134,10 +135,25 @@ async fn overview(State(app): State<Arc<App>>, headers: HeaderMap) -> Json<Value
         let files: Vec<_> = profile.files.iter().map(|file| {
             let m = models.iter().find(|m| m["file"] == *file).unwrap();
             let installed = if app.runtime.managed { dir.as_ref().is_some_and(|d| d.join(file).is_file()) } else { m["stp_installed"] == true };
-            json!({"file":file,"name":m["name"],"installed":installed})
+            json!({"file":file,"name":m["name"],"installed":installed,"size_bytes":dir.as_ref().and_then(|d| std::fs::metadata(d.join(file)).ok()).map(|m|m.len())})
         }).collect();
         json!({"id":profile.id,"name":profile.name,"kind":if profile.video {"video"} else {"image"},"files":files})
     }).collect();
+    let local = app.runtime.managed
+        || reqwest::Url::parse(&app.runtime.engine.endpoint)
+            .ok()
+            .is_some_and(|url| matches!(url.host_str(), Some("127.0.0.1" | "localhost" | "::1")));
+    let pid = app
+        .runtime
+        .child
+        .try_lock()
+        .ok()
+        .and_then(|child| child.as_ref().and_then(|c| c.id()));
+    let metrics = if local {
+        app.manager.metrics.sample(pid).await
+    } else {
+        Value::Null
+    };
     let activity = app.manager.activity.lock().await.clone();
     let operation = app
         .manager
@@ -148,7 +164,7 @@ async fn overview(State(app): State<Arc<App>>, headers: HeaderMap) -> Json<Value
         .filter(|(_, task)| !task.is_finished())
         .map(|(id, _)| id.clone());
     Json(
-        json!({"stp_url":stp_url,"version":env!("CARGO_PKG_VERSION"),"engine_online":online,"managed":app.runtime.managed,"busy":app.capacity.available_permits()==0,"jobs":app.jobs.load(Ordering::SeqCst),"offline":app.runtime.offline,"models_dir":dir.map(|d| d.to_string_lossy().into_owned()),"engine_endpoint":app.runtime.engine.endpoint,"profiles":profiles,"tools_count":catalog::descriptors(&meta)["tools"].as_array().unwrap().len(),"loras_count":store::array(&meta.loras).len(),"activity":activity,"operation":operation}),
+        json!({"metrics":metrics,"stp_url":stp_url,"version":env!("CARGO_PKG_VERSION"),"engine_online":online,"managed":app.runtime.managed,"busy":app.capacity.available_permits()==0,"jobs":app.jobs.load(Ordering::SeqCst),"offline":app.runtime.offline,"models_dir":dir.map(|d| d.to_string_lossy().into_owned()),"engine_endpoint":app.runtime.engine.endpoint,"profiles":profiles,"tools_count":catalog::descriptors(&meta)["tools"].as_array().unwrap().len(),"loras_count":store::array(&meta.loras).len(),"activity":activity,"operation":operation}),
     )
 }
 fn failure(code: StatusCode, text: &str) -> Response {
@@ -199,7 +215,24 @@ async fn action(State(app): State<Arc<App>>, Json(body): Json<Value>) -> Respons
         "refresh" => "Refresh models",
         _ => "Download model",
     };
-    app.manager.begin(&id, title).await;
+    let title = if kind == "install" {
+        let meta = app.catalog.read().await;
+        let name = store::array(&meta.models)
+            .iter()
+            .find(|m| m["file"] == file)
+            .and_then(|m| m["name"].as_str())
+            .unwrap_or("model")
+            .to_owned();
+        format!("Download {name}")
+    } else {
+        title.to_owned()
+    };
+    app.manager.begin(&id, &title).await;
+    if kind == "install" {
+        if let Some(row) = app.manager.activity.lock().await.front_mut() {
+            row["file"] = json!(file);
+        }
+    }
     let _ = app.events.send(json!({"jsonrpc":"2.0","method":"provider.state","params":{"state":"in_progress","summary":title}}));
     let response = (StatusCode::ACCEPTED, Json(json!({"id":id}))).into_response();
     let operation_id = id.clone();

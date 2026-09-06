@@ -17,3 +17,5 @@ pub mod proto {
 pub mod generated {
     include!(concat!(env!("OUT_DIR"), "/config_generated.rs"));
 }
+
+pub mod metrics;
