@@ -164,4 +164,3 @@ message PubkeyRequest { string name = 1; }
 message PubkeyResponse { string message = 1; string pubkey = 2; }
 message HoursRequest {}
 message HoursResponse { ComputeUnitThreshold thresholds = 1; }
-

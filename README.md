@@ -44,7 +44,7 @@ Protobuf bindings are generated at build time using a build-only vendored protoc
 The checked-in FlatBuffer bindings were generated using flatc 25.12.19:
 
 ```sh
-flatc --rust --gen-object-api -o src/generated schemas/config.fbs
+tools/drawthings generate
 ```
 
 ## Use through STP

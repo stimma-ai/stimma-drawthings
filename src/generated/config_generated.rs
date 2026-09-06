@@ -3477,4 +3477,3 @@ pub fn finish_size_prefixed_generation_configuration_buffer<'a, 'b, A: ::flatbuf
 }  // pub mod config
 }  // pub mod _generated
 }  // pub mod stimma_drawthings
-
