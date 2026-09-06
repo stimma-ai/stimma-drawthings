@@ -1,2 +1,4 @@
 /target/
 /.validation/
+
+/manager-ui/node_modules/

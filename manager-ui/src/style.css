@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Stimma Atelier v3 semantic palette. Geometry stays the same in both themes. */
+:root { --base:11 14 20; --surface:19 23 32; --surface-raised:28 34 48; --surface-hover:35 42 58; --content:232 234 240; --content-secondary:154 163 180; --content-tertiary:124 133 151; --edge:35 42 54; --accent:18 166 150; --selection:129 140 248; --success:74 222 128; --failure:248 113 113; --running:96 165 250; color-scheme:dark; }
+[data-theme=light] { --base:255 255 255; --surface:244 244 245; --surface-raised:228 228 231; --surface-hover:212 212 216; --content:24 24 27; --content-secondary:82 82 91; --content-tertiary:113 113 122; --edge:228 228 231; --accent:13 148 136; --selection:99 102 241; --success:21 128 61; --failure:185 28 28; --running:37 99 235; color-scheme:light; }
+@font-face { font-family:'General Sans'; src:url('../public/GeneralSans-Semibold.woff2') format('woff2'); font-weight:600; font-display:swap; }
+@layer base {
+  body { @apply m-0 bg-base text-content text-sm antialiased; }
+  button, input, select, a { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60; }
+  button { @apply disabled:opacity-50 disabled:cursor-not-allowed; }
+  ::selection { background:rgb(var(--selection) / .25); }
+}
+@layer components {
+  .fact { @apply font-mono text-xs tabular-nums; }
+  .section-title { @apply text-xs font-semibold text-content-secondary; }
+  .field { @apply w-full rounded-md bg-surface-raised px-3 py-2 text-sm text-content; }
+  .status-dot { @apply inline-block h-1.5 w-1.5 shrink-0 rounded-full; }
+}
+@media (pointer:coarse) { button,select,input { min-height:44px; } }

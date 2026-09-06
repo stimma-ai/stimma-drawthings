@@ -15,6 +15,8 @@ use tokio::sync::{mpsc, RwLock, Semaphore};
 
 pub struct App {
     pub runtime: Runtime,
+    pub manager: Arc<crate::manager::Manager>,
+    pub events: tokio::sync::broadcast::Sender<Value>,
     pub catalog: RwLock<MetadataOverride>,
     pub capacity: Arc<Semaphore>,
     pub jobs: std::sync::atomic::AtomicUsize,
@@ -26,9 +28,10 @@ impl App {
         Ok(())
     }
     pub fn registration(&self, websocket: bool) -> Value {
-        let mut p = json!({"stp_version":"1.0","provider_id":"stimma-drawthings","provider_name":"Draw Things","server":concat!("stimma-drawthings/",env!("CARGO_PKG_VERSION")),"max_concurrent":1,"capabilities":{"cancel":true}});
+        let mut p = json!({"stp_version":"1.0","provider_id":"stimma-drawthings","provider_name":"Draw Things","server":concat!("stimma-drawthings/",env!("CARGO_PKG_VERSION")),"max_concurrent":1,"capabilities":{"cancel":true,"provider_state":true}});
         if websocket {
             p["asset_endpoint"] = json!("/assets");
+            p["presentation"] = json!({"management_url":crate::manager::PREFIX,"icon":format!("data:image/svg+xml;base64,{}",base64::Engine::encode(&base64::engine::general_purpose::STANDARD,include_bytes!("../manager-ui/public/drawthings.svg")))});
         }
         json!({"jsonrpc":"2.0","id":"register","method":"provider.register","params":p})
     }
@@ -94,12 +97,28 @@ pub async fn session(
     websocket: bool,
 ) -> Result<()> {
     tokio::fs::create_dir_all(&assets).await?;
+    let session_prefix = format!("{}/", uuid::Uuid::new_v4());
+    let observer_prefix = session_prefix.clone();
+    let manager = app.manager.clone();
+    let host_tx = tx;
+    let (tx, mut observed_rx) = mpsc::channel::<Value>(32);
+    tokio::spawn(async move {
+        while let Some(message) = observed_rx.recv().await {
+            manager.observe(&observer_prefix, &message).await;
+            if host_tx.send(message).await.is_err() {
+                break;
+            }
+        }
+    });
+    let mut events = app.events.subscribe();
     send(&tx, app.registration(websocket)).await?;
+    send(&tx, json!({"jsonrpc":"2.0","method":"provider.state","params":{"state":if app.capacity.available_permits()==0 {"in_progress"} else {"ready"}}})).await?;
     let mut jobs: Vec<Job> = Vec::new();
     let mut uploads: HashMap<String, Value> = HashMap::new();
     let outcome=async {
         loop {
             let message=tokio::select! {
+                event=events.recv()=>{ if let Ok(event)=event { send(&tx,event).await?; } continue; },
                 message=input.recv()=>match message{Some(m)=>m,None=>break},
                 outcome=async{if jobs.is_empty(){std::future::pending().await}else{let (outcome,index,_) = futures_util::future::select_all(jobs.iter_mut().map(|j| &mut j.handle)).await;(outcome,index)}}=>{
                     let finished=jobs.remove(outcome.1);terminal(&app,&tx,&finished.id,outcome.0.map_err(anyhow::Error::from).and_then(|r|r)).await?;continue;
@@ -123,6 +142,7 @@ pub async fn session(
                     if request_id.is_empty(){error(&tx,id,-32602,"request_id is required".into()).await?;continue;}
                     if let Err(e)=catalog::prepare(&tool,&parameters,&*app.catalog.read().await){error(&tx,id,-32602,e.to_string()).await?;continue;}
                     if jobs.iter().any(|j| j.id == request_id){error(&tx,id,-32602,"Duplicate request_id".into()).await?;continue;}
+                    app.manager.begin(&format!("{session_prefix}{request_id}"), &tool).await;
                     app.jobs.fetch_add(1,std::sync::atomic::Ordering::SeqCst);
                     let ticket=JobTicket{app:app.clone(),tx:tx.clone()};
                     reply(&tx,id,json!({"accepted":true})).await?;queue(&app,&tx).await?;
@@ -154,6 +174,7 @@ pub async fn session(
     for task in jobs {
         task.handle.abort();
         let _ = task.handle.await;
+        app.manager.observe(&session_prefix, &json!({"method":"tools.result","params":{"request_id":task.id,"success":false,"error":{"code":"CANCELLED","message":"Client disconnected"}}})).await;
     }
     for pending in uploads.values() {
         if let Some(id) = pending["asset_id"].as_str() {

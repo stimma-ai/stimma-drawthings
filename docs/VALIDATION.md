@@ -69,3 +69,7 @@ Training, desktop canvas/project operations, general checkpoint conversion,
 cloud billing/authentication, and arbitrary ComfyUI workflows are outside this
 provider's native-generation API boundary. Preview projection is approximate and
 available only for recognized image latent layouts.
+
+## Embedded manager
+
+Verified real managed-engine start and stop through the browser, model search, connection details, and light/dark layouts at narrow widths. HTTP integration checks cover token-free network access, relative embedded assets, catalog counts, rejected unknown checkpoints, and operation completion. The manager shares the generation semaphore so setup and generation cannot run concurrently.

@@ -30,6 +30,8 @@ ws://127.0.0.1:8765/stp-v1
 
 To accept connections from other machines, add `--bind 0.0.0.0:8765` and use this machine's IP address in the connection URL. Authentication is optional: set `STIMMA_DRAWTHINGS_TOKEN` if you want clients to supply a bearer token.
 
+Open the Draw Things manager from Stimma’s provider toolbar, or visit `http://127.0.0.1:8765/stp-v1/manage/` in your browser. It lets you start and stop the engine, browse and download models, and follow recent activity. The manager is built into the adapter; there is nothing else to install.
+
 Leave the adapter running while you use it. It starts the generation engine when needed and keeps it loaded between requests. The first generation may take longer while models download.
 
 If your Draw Things models live in a custom folder, start it with:
@@ -85,6 +87,8 @@ tools/drawthings lint
 ```
 
 The binary is written to `target/release/stimma-drawthings`. Tests use a mock Draw Things server and the real STP CLI; they don't require model downloads or a GPU.
+
+To edit the manager UI, install Node.js 22 or later, change files in `manager-ui/src`, and run `tools/drawthings ui` before building the adapter. Commit the rebuilt `manager-ui/dist` files with your changes.
 
 Run a development build with `tools/drawthings run --websocket`. Use `stimma-drawthings --help` for configuration options.
 

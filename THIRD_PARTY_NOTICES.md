@@ -43,3 +43,11 @@ Exact versions are recorded in `Cargo.lock`. [THIRD_PARTY_LICENSES.md](THIRD_PAR
 contains the compiled dependencies' license texts and attributions, generated
 with `cargo-about` using `about.toml` and `tools/licenses.hbs`.
 Build-only and test-only tools are not part of the shipped executable.
+
+## Manager artwork and fonts
+
+The Draw Things app artwork is from [drawthings.ai](https://drawthings.ai/images/Logo-Lockup-H-1.png), used to identify the connected provider. The SVG currently embeds that official raster artwork; it is not a vector redraw. Draw Things branding belongs to Draw Things, Inc.
+
+General Sans is by Indian Type Foundry, obtained from [Fontshare](https://www.fontshare.com/fonts/general-sans) for the manager interface. Its [font license](vendor/fonts/LICENSE.txt) accompanies the application.
+
+The manager uses Vue (MIT), with build dependencies Vite (MIT), Tailwind CSS (MIT), PostCSS (MIT), and Autoprefixer (MIT). See `manager-ui/package-lock.json` for the pinned build dependency graph.

@@ -73,6 +73,8 @@ async fn main() -> Result<()> {
     let catalog = store::catalog(&runtime, false).await?;
     let app = Arc::new(App {
         runtime,
+        manager: Arc::new(stimma_drawthings::manager::Manager::default()),
+        events: tokio::sync::broadcast::channel(64).0,
         catalog: RwLock::new(catalog),
         capacity: Arc::new(Semaphore::new(1)),
         jobs: std::sync::atomic::AtomicUsize::new(0),

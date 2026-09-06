@@ -241,6 +241,28 @@ async fn websocket_stp_and_authenticated_asset_transfer() {
         tokio::time::sleep(Duration::from_millis(50)).await;
     }
     let client = reqwest::Client::new();
+    let manager = format!("http://{web}/stp-v1/manage/");
+    assert_eq!(client.get(&manager).send().await.unwrap().status(), 401);
+    assert!(client
+        .get(&manager)
+        .bearer_auth("test-token")
+        .send()
+        .await
+        .unwrap()
+        .status()
+        .is_success());
+    assert_eq!(
+        client
+            .post(format!("{manager}api/action"))
+            .bearer_auth("test-token")
+            .json(&json!({"action":"stop"}))
+            .send()
+            .await
+            .unwrap()
+            .status(),
+        409,
+        "The manager must not stop an attached engine"
+    );
     let asset = format!("http://{web}/assets/fixture.png");
     assert_eq!(
         client
@@ -444,6 +466,70 @@ async fn network_listener_works_without_auth_configuration() {
         String::from_utf8_lossy(&result.stderr)
     );
     assert!(String::from_utf8_lossy(&result.stdout).contains("z-image-turbo"));
+    let client = reqwest::Client::new();
+    let base = format!("http://127.0.0.1:{port}/stp-v1/manage");
+    let html = client
+        .get(format!("{base}/"))
+        .send()
+        .await
+        .unwrap()
+        .text()
+        .await
+        .unwrap();
+    assert!(html.contains("Draw Things · Stimma"));
+    assert!(
+        html.contains("./assets/"),
+        "Manager assets must work behind a proxy"
+    );
+    let overview: Value = client
+        .get(format!("{base}/api/overview"))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(overview["tools_count"], 28);
+    assert_eq!(overview["stp_url"], format!("ws://127.0.0.1:{port}/stp-v1"));
+    let invalid = client
+        .post(format!("{base}/api/action"))
+        .json(&json!({"action":"install","file":"../../not-a-model"}))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(invalid.status(), 400);
+    let stopped = client
+        .post(format!("{base}/api/action"))
+        .json(&json!({"action":"stop"}))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(stopped.status(), 202);
+    for _ in 0..100 {
+        let state: Value = client
+            .get(format!("{base}/api/overview"))
+            .send()
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap();
+        if state["activity"][0]["state"] == "done" {
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    }
+    let state: Value = client
+        .get(format!("{base}/api/overview"))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert_eq!(state["activity"][0]["state"], "done");
+    assert_eq!(state["busy"], false);
+
     provider.kill().await.unwrap();
     provider.wait().await.unwrap();
 }

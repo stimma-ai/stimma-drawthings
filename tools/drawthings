@@ -5,6 +5,7 @@ case "${1:-help}" in
   build) shift
     export RUSTFLAGS="${RUSTFLAGS:-} --remap-path-prefix=$HOME=/build --remap-path-prefix=$(pwd)=/src/stimma-drawthings"
     cargo build --release "$@" ;;
+  ui) (cd manager-ui && npm ci && npm run build) ;;
   package) shift; exec tools/package "$@" ;;
   release) exec tools/release ;;
   runtime-release) shift; exec tools/runtime-release "$@" ;;
@@ -19,5 +20,5 @@ case "${1:-help}" in
       src/generated/config_generated.rs > src/generated/config_generated.rs.tmp
     mv src/generated/config_generated.rs.tmp src/generated/config_generated.rs
     ;;
-  *) echo 'Usage: tools/drawthings {build|test|lint|generate|licenses|package|release|runtime-release|run [provider options]}' ;;
+  *) echo 'Usage: tools/drawthings {build|test|lint|ui|generate|licenses|package|release|runtime-release|run [provider options]}' ;;
 esac

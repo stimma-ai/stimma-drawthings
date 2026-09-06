@@ -184,8 +184,9 @@ pub async fn serve(
             get(get_asset).put(put_asset).delete(delete_asset),
         )
         .layer(DefaultBodyLimit::max(2 * 1024 * 1024 * 1024))
-        .layer(middleware::from_fn_with_state(state.clone(), auth))
-        .with_state(state);
+        .with_state(state.clone())
+        .merge(crate::manager::routes(state.app.clone()))
+        .layer(middleware::from_fn_with_state(state, auth));
     let listener = tokio::net::TcpListener::bind(bind)
         .await
         .context("Binding STP WebSocket server")?;

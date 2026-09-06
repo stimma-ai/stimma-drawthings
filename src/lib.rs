@@ -2,6 +2,7 @@ pub mod catalog;
 pub mod engine;
 pub mod generation;
 pub mod install;
+pub mod manager;
 pub mod media;
 pub mod provider;
 pub mod store;
