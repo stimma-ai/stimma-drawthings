@@ -5,3 +5,5 @@ Tools lists every supported model with its task types, shows which are downloade
 Stimma only receives tools whose checkpoint is downloaded, and each tool offers only its downloaded checkpoint versions. Hosts that advertise STP `tool_status` receive the remaining tools flagged `needs_setup`. Nothing downloads on first generation; the manager owns downloads.
 
 The provider icon is a small copy of the Draw Things app icon, embedded as a data URI so hosts show it without fetching anything.
+
+FFmpeg is no longer downloaded. Video output uses the FFmpeg installed on the machine, found via `--ffmpeg`, `STIMMA_DRAWTHINGS_FFMPEG`, or PATH.

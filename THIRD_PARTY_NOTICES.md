@@ -27,15 +27,9 @@ ComfyUI runtime. These matrices provide approximate latent previews, not final V
 
 ## FFmpeg
 
-The optional encoder download uses the public ImageIO FFmpeg builds pinned in
-`data/encoders.json`. Each executable's SHA-256 is checked before installation.
-The binaries are fetched directly from the
-[ImageIO binary repository](https://github.com/imageio/imageio-binaries/tree/f8f64710ea88e7e4a352c0f7d8c0deac9f5fd685/ffmpeg).
-See its [FFmpeg build project](https://github.com/imageio/imageio-ffmpeg),
-[FFmpeg source](https://ffmpeg.org/download.html#get-sources), and the downloaded
-binary's `-L` and `-buildconf` output for the GPL/LGPL terms and enabled codecs.
-No FFmpeg executable is redistributed inside this repository or provider archive.
-Users may instead supply `--ffmpeg`.
+Video output is encoded with the FFmpeg already installed on the machine
+(`--ffmpeg`, `STIMMA_DRAWTHINGS_FFMPEG`, or `ffmpeg` on PATH). No FFmpeg build
+is downloaded or redistributed by this project.
 
 ## Rust dependencies
 

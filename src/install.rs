@@ -316,30 +316,30 @@ impl Runtime {
         executable(&p)?;
         Ok(p)
     }
-    pub async fn encoder(&self, progress: Option<&Progress>) -> Result<PathBuf> {
+    /// FFmpeg is never downloaded: use `--ffmpeg`, `STIMMA_DRAWTHINGS_FFMPEG`,
+    /// or the `ffmpeg` on PATH that the host already asked the user to install.
+    pub async fn encoder(&self, _progress: Option<&Progress>) -> Result<PathBuf> {
         if let Some(p) = &self.ffmpeg {
             return Ok(p.clone());
         }
-        let manifest: Value = serde_json::from_str(include_str!("../data/encoders.json"))?;
-        let key = format!("{}-{}", std::env::consts::OS, std::env::consts::ARCH);
-        let entry = &manifest[&key];
-        ensure!(
-            !entry.is_null(),
-            "Set --ffmpeg to a compatible executable on this platform"
-        );
-        let p = self
-            .state
-            .join("runtime/ffmpeg")
-            .join(entry["file"].as_str().unwrap());
-        fetch(
-            entry["url"].as_str().unwrap(),
-            entry["sha256"].as_str().unwrap(),
-            &p,
-            progress,
-            self.offline,
-        )
-        .await?;
-        executable(&p)?;
-        Ok(p)
+        if let Some(p) = std::env::var_os("STIMMA_DRAWTHINGS_FFMPEG").filter(|v| !v.is_empty()) {
+            let p = PathBuf::from(p);
+            ensure!(
+                p.is_file(),
+                "STIMMA_DRAWTHINGS_FFMPEG does not point to an executable"
+            );
+            return Ok(p);
+        }
+        let name = if cfg!(windows) {
+            "ffmpeg.exe"
+        } else {
+            "ffmpeg"
+        };
+        std::env::var_os("PATH")
+            .into_iter()
+            .flat_map(|paths| std::env::split_paths(&paths).collect::<Vec<_>>())
+            .map(|dir| dir.join(name))
+            .find(|p| p.is_file())
+            .context("FFmpeg is not installed; install it or pass --ffmpeg")
     }
 }
